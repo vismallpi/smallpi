@@ -55,7 +55,7 @@ def get_boc_exchange_rates():
 # 2. 获取上海明天天气预报 (来自中国天气网)
 # =============================================
 def get_shanghai_weather_tomorrow():
-    url = "http://www.weather.com.cn/weather/101020100.shtml"
+    url = "https://m.weather.com.cn/mweather15d/101020100.shtml?t=1451552930023"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
