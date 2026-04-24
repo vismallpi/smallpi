@@ -373,13 +373,28 @@
             renderTasks();
         }
 
-        // 格式化创建时间
+        // 格式化创建时间 - 强制使用北京时间 (GMT+8)
         function formatCreatedAt(createdAt) {
-            const date = new Date(createdAt);
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
+            // 任务id就是北京时间的毫秒时间戳，优先使用task.id生成时间，保证准确
+            let date;
+            if (typeof createdAt === 'string' && !isNaN(Number(createdAt))) {
+                date = new Date(Number(createdAt));
+            } else if (createdAt.includes('-')) {
+                // 如果是ISO字符串，强制添加+08:00让浏览器解析为北京时间
+                if (!createdAt.includes('+')) {
+                    createdAt = createdAt + '+08:00';
+                }
+                date = new Date(createdAt);
+            } else {
+                date = new Date(createdAt);
+            }
+            
+            // 强制转换为北京时间
+            const beijingDate = new Date(date.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
+            const month = beijingDate.getMonth() + 1;
+            const day = beijingDate.getDate();
+            const hours = String(beijingDate.getHours()).padStart(2, '0');
+            const minutes = String(beijingDate.getMinutes()).padStart(2, '0');
             return `${month}/${day} ${hours}:${minutes}`;
         }
 

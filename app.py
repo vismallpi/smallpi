@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
 import sqlite3
 from datetime import datetime
+import pytz
+
+# 设置时区为北京时间
+beijing_tz = pytz.timezone('Asia/Shanghai')
 
 app = Flask(__name__)
 
@@ -51,18 +55,20 @@ def get_tasks():
 @app.route('/api/tasks', methods=['POST'])
 def add_task():
     data = request.get_json()
+    now = datetime.now(beijing_tz)
     task = {
-        'id': str(int(datetime.now().timestamp() * 1000)),
+        'id': str(int(now.timestamp() * 1000)),
         'text': data['text'],
         'completed': False,
-        'date': datetime.now().isoformat().split('T')[0]
+        'date': now.isoformat().split('T')[0],
+        'created_at': now.strftime('%Y-%m-%d %H:%M:%S')
     }
     
     conn = sqlite3.connect('tasks.db')
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO tasks (id, text, completed, date) VALUES (?, ?, ?, ?)',
-        (task['id'], task['text'], int(task['completed']), task['date'])
+        'INSERT INTO tasks (id, text, completed, date, created_at) VALUES (?, ?, ?, ?, ?)',
+        (task['id'], task['text'], int(task['completed']), task['date'], task['created_at'])
     )
     conn.commit()
     conn.close()
