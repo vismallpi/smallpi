@@ -52,7 +52,7 @@ def get_tasks():
             'id': task[0],
             'text': task[1],
             'completed': bool(task[2]),
-            'priority': task[3] || 'medium',
+            'priority': task[3] or 'medium',
             'date': task[4],
             'created_at': task[5]
         })
