@@ -75,19 +75,19 @@
 
         .add-task button {
             padding: 12px 18px;
-            background-color: #2eaadc;
+            background-color: #37352f;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
             min-height: 48px;
         }
 
         .add-task button:hover {
-            background-color: #289fc7;
+            background-color: #2f352f;
         }
 
         .date-group {
@@ -130,13 +130,13 @@
         }
 
         .task-item.drag-over {
-            border-top: 3px solid #2eaadc;
+            border-top: 3px solid #37352f;
         }
 
         .drag-handle {
             cursor: grab;
             padding: 0 6px;
-            color: #ccc;
+            color: #9b9a97;
             font-size: 16px;
             align-self: center;
             flex-shrink: 0;
@@ -162,8 +162,8 @@
         }
 
         .task-checkbox.checked {
-            background-color: #2eaadc;
-            border-color: #2eaadc;
+            background-color: #37352f;
+            border-color: #37352f;
         }
 
         .task-checkbox.checked::after {
@@ -307,12 +307,12 @@
         }
 
         .modal-btn-confirm {
-            background-color: #2eaadc;
+            background-color: #37352f;
             color: #ffffff;
         }
 
         .modal-btn-confirm:hover {
-            background-color: #289fc7;
+            background-color: #2f352f;
         }
 
         /* 优先级分组 - Notion简约风格 */
@@ -448,7 +448,7 @@
         <div class="add-task">
             <input type="text" id="newTaskInput" placeholder="添加新任务...">
             <button id="addTaskBtn">添加</button>
-            <button id="voiceInputBtn" style="background-color: #8e44ad;">🎤</button>
+            <button id="voiceInputBtn" style="background-color: #5f6368; color: white;">🎤</button>
         </div>
 
         <div id="taskList"></div>
