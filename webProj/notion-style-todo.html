@@ -236,7 +236,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.1.9 - 对接飞书语音识别 · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.1.10 - 对接飞书语音识别 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -760,7 +760,7 @@ const pageTitleEl = document.getElementById('pageTitle');
 // 页面加载时读取保存的标题
 async function loadPageTitle() {
     try {
-        const response = await fetch(`${API_BASE}/api/page-title`);
+        const response = await fetch(`${API_BASE}/page-title`);
         const data = await response.json();
         if (data.success && data.title) {
             pageTitleEl.textContent = data.title;
@@ -775,7 +775,7 @@ async function loadPageTitle() {
 pageTitleEl.addEventListener('input', async () => {
     const currentTitle = pageTitleEl.textContent.trim();
     try {
-        await fetch(`${API_BASE}/api/page-title`, {
+        await fetch(`${API_BASE}/page-title`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
