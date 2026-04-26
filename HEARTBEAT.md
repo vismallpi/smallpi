@@ -42,3 +42,12 @@
   - Full URL: https://fqjt33o3gr7.feishu.cn/base/I2VNbkpkTaUDISsACs5ctFDgnte?table=tblAHeovs5u8j1Th
 - Post to:
   1. 当前个人聊天 (魏总: ou_a331505193726d421fb0108a11bc6197)
+
+## Daily automatic task: Force push workspace to GitHub
+- Frequency: every day at 7:00 AM GMT+8 and 7:00 PM GMT+8
+- Tasks:
+  1. cd /root/.openclaw/workspace
+  2. git add .
+  3. git commit -a -m "Auto backup: $(date +'%Y-%m-%d %H:%M') workspace backup"
+  4. git push -f origin master
+  5. 推送完成后发送通知确认
