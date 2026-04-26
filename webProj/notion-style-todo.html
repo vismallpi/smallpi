@@ -445,7 +445,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.3.0 - 优先级分组 · 已完成整体收缩 · 弹窗文字居中 · 移动端整体样式美化 · 自定义底部弹窗确认 · 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.3.1 - 优先级分组 空分组显示 · 拖拽自动保存优先级 · 已完成整体收缩 · 弹窗文字居中 · 移动端整体样式美化 · 自定义底部弹窗确认 · 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -545,28 +545,74 @@ async function renderTasks() {
     emptyStateEl.style.display = 'none';
     taskList.innerHTML = '';
 
-    // 高优先级未完成（一直展开）
-    if (grouped.high.length > 0) {
-        const priorityGroupEl = document.createElement('div');
-        priorityGroupEl.className = 'priority-group';
+    // 高优先级未完成（一直展开，空分组也显示）
+    const highGroupEl = document.createElement('div');
+    highGroupEl.className = 'priority-group';
 
-        const header = document.createElement('div');
-        header.className = 'priority-header high-priority-header';
-        header.innerHTML = `
-            <span>🔴 高优先级</span>
-            <span class="count-badge">${grouped.high.length}</span>
-        `;
+    const highHeader = document.createElement('div');
+    highHeader.className = 'priority-header high-priority-header';
+    highHeader.innerHTML = `
+        <span>🔴 高优先级</span>
+        <span class="count-badge">${grouped.high.length}</span>
+    `;
 
-        const taskListContainer = document.createElement('div');
-        taskListContainer.className = 'task-list';
-        grouped.high.forEach(task => {
-            const taskEl = createTaskElement(task);
-            taskListContainer.appendChild(taskEl);
-        });
+    const highListContainer = document.createElement('div');
+    highListContainer.className = 'task-list';
+    grouped.high.forEach(task => {
+        const taskEl = createTaskElement(task);
+        highListContainer.appendChild(taskEl);
+    });
 
-        priorityGroupEl.appendChild(header);
-        priorityGroupEl.appendChild(taskListContainer);
-        taskListEl.appendChild(priorityGroupEl);
+    highGroupEl.appendChild(highHeader);
+    highGroupEl.appendChild(highListContainer);
+    taskListEl.appendChild(highGroupEl);
+
+    // 中等优先级未完成（一直展开，空分组也显示，默认所有新任务都放这里）
+    const mediumGroupEl = document.createElement('div');
+    mediumGroupEl.className = 'priority-group';
+
+    const mediumHeader = document.createElement('div');
+    mediumHeader.className = 'priority-header medium-priority-header';
+    mediumHeader.innerHTML = `
+        <span>🟡 中等优先级</span>
+        <span class="count-badge">${grouped.medium.length}</span>
+    `;
+
+    const mediumListContainer = document.createElement('div');
+    mediumListContainer.className = 'task-list';
+    grouped.medium.forEach(task => {
+        const taskEl = createTaskElement(task);
+        mediumListContainer.appendChild(taskEl);
+    });
+
+    mediumGroupEl.appendChild(mediumHeader);
+    mediumGroupEl.appendChild(mediumListContainer);
+    taskListEl.appendChild(mediumGroupEl);
+
+    // 所有已完成（默认收缩，空分组也显示）
+    const completeGroupEl = document.createElement('div');
+    completeGroupEl.className = 'priority-group';
+
+    const completeHeader = document.createElement('div');
+    completeHeader.className = 'date-group-header collapsed';
+    completeHeader.innerHTML = `
+        <span>✅ 已完成 (${grouped.completed.length})</span>
+        <span class="toggle-icon">▾</span>
+    `;
+    completeHeader.addEventListener('click', () => {
+        completeHeader.classList.toggle('collapsed');
+    });
+
+    const completeList = document.createElement('div');
+    completeList.className = 'date-group-content task-list';
+    grouped.completed.forEach(task => {
+        const taskEl = createTaskElement(task);
+        completeList.appendChild(taskEl);
+    });
+
+    completeGroupEl.appendChild(completeHeader);
+    completeGroupEl.appendChild(completeList);
+    taskListEl.appendChild(completeGroupEl);
     }
 
     // 中等优先级未完成（一直展开，默认所有新任务都放这里）
@@ -871,7 +917,39 @@ function enableDragSort() {
         document.querySelectorAll('.task-item').forEach(item => {
             item.classList.remove('drag-over');
         });
+
+        // 拖拽结束后，更新所有任务的优先级（根据它们现在所在的分组）
+        await updateAllPriorities();
     });
+
+    // 更新所有任务优先级 - 根据DOM位置重新保存优先级
+    async function updateAllPriorities() {
+        // 遍历所有分组
+        const allGroups = document.querySelectorAll('.priority-group .task-list');
+        allGroups.forEach(async (list, groupIndex) => {
+            const tasks = [];
+            list.querySelectorAll('.task-item').forEach(taskEl => {
+                const taskId = taskEl.dataset.taskId;
+                tasks.push(taskId);
+            });
+
+            // 判断分组：0 = high, 1 = medium, 2 = completed
+            let priority;
+            if (groupIndex === 0) priority = 'high';
+            else if (groupIndex === 1) priority = 'medium';
+            else priority = 'completed';
+
+            for (const taskId of tasks) {
+                await fetch(`${API_BASE}/tasks/${taskId}/priority`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ priority })
+                });
+            }
+        });
+    }
 
     // ======== 移动端触摸拖拽 ========
     let draggedItemMobile = null;
@@ -938,6 +1016,9 @@ function enableDragSort() {
         isDragging = false;
         draggedItemMobile = null;
         draggedItem = null;
+
+        // 拖拽结束后更新所有优先级
+        await updateAllPriorities();
     });
 }
 

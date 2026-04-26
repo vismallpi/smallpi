@@ -129,6 +129,21 @@ def update_task(task_id):
     
     return jsonify({'success': updated, 'id': task_id, 'text': text})
 
+# 更新任务优先级
+@app.route('/api/tasks/<task_id>/priority', methods=['PUT'])
+def update_task_priority(task_id):
+    data = request.get_json()
+    priority = data.get('priority')
+    
+    conn = sqlite3.connect('tasks.db')
+    cursor = conn.cursor()
+    cursor.execute('UPDATE tasks SET priority = ? WHERE id = ?', (priority, task_id))
+    conn.commit()
+    updated = cursor.rowcount > 0
+    conn.close()
+    
+    return jsonify({'success': updated, 'id': task_id, 'priority': priority})
+
 # 飞书语音识别API
 @app.route('/api/recognize', methods=['POST'])
 def recognize_speech():
