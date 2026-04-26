@@ -607,58 +607,6 @@ async function renderTasks() {
     completeGroupEl.appendChild(completeHeader);
     completeGroupEl.appendChild(completeList);
     taskListEl.appendChild(completeGroupEl);
-    }
-
-    // 中等优先级未完成（一直展开，默认所有新任务都放这里）
-    if (grouped.medium.length > 0) {
-        const priorityGroupEl = document.createElement('div');
-        priorityGroupEl.className = 'priority-group';
-
-        const header = document.createElement('div');
-        header.className = 'priority-header medium-priority-header';
-        header.innerHTML = `
-            <span>🟡 中等优先级</span>
-            <span class="count-badge">${grouped.medium.length}</span>
-        `;
-
-        const taskListContainer = document.createElement('div');
-        taskListContainer.className = 'task-list';
-        grouped.medium.forEach(task => {
-            const taskEl = createTaskElement(task);
-            taskListContainer.appendChild(taskEl);
-        });
-
-        priorityGroupEl.appendChild(header);
-        priorityGroupEl.appendChild(taskListContainer);
-        taskListEl.appendChild(priorityGroupEl);
-    }
-
-    // 所有已完成（默认收缩）
-    if (grouped.completed.length > 0) {
-        const completeGroupEl = document.createElement('div');
-        completeGroupEl.className = 'priority-group';
-
-        const completeHeader = document.createElement('div');
-        completeHeader.className = 'date-group-header collapsed';
-        completeHeader.innerHTML = `
-            <span>✅ 已完成 (${grouped.completed.length})</span>
-            <span class="toggle-icon">▾</span>
-        `;
-        completeHeader.addEventListener('click', () => {
-            completeHeader.classList.toggle('collapsed');
-        });
-
-        const completeList = document.createElement('div');
-        completeList.className = 'date-group-content task-list';
-        grouped.completed.forEach(task => {
-            const taskEl = createTaskElement(task);
-            completeList.appendChild(taskEl);
-        });
-
-        completeGroupEl.appendChild(completeHeader);
-        completeGroupEl.appendChild(completeList);
-        taskListEl.appendChild(completeGroupEl);
-    }
 
     console.log('Render complete');
 }
