@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="80 42 8 3" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f0f8ff"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-size="24" font-weight="bold" fill="#2c3e50">新疆伊犁自驾行程 (2026.5.1-5.6)</text>
+  
+  <!-- Scale: 1 degree ≈ 80 pixels -->
+  <g transform="translate(0, 60) scale(80, -80) translate(-80, -40)">
+    <!-- Grid lines -->
+    <line x1="80" y1="42" x2="88" y2="42" stroke="#ccc" stroke-width="0.01"/>
+    <line x1="80" y1="45" x2="88" y2="45" stroke="#ccc" stroke-width="0.01"/>
+    <line x1="80" y1="42" x2="80" y2="45" stroke="#ccc" stroke-width="0.01"/>
+    <line x1="88" y1="42" x2="88" y2="45" stroke="#ccc" stroke-width="0.01"/>
+    
+    <!-- Day 1: 伊宁 - 赛里木湖 - 果子沟大桥 - 伊宁 -->
+    <path d="M 81.33 43.91 L 81.20 44.50 L 81.18 44.45 L 81.33 43.91" stroke="#e74c3c" stroke-width="0.03" fill="none"/>
+    
+    <!-- Day 2: 伊宁 - 喀拉峻 - 特克斯 -->
+    <path d="M 81.33 43.91 L 82.20 43.10 L 81.83 43.20" stroke="#3498db" stroke-width="0.03" fill="none"/>
+    
+    <!-- Day 3: 特克斯 - 库尔德宁 - 巩留 -->
+    <path d="M 81.83 43.20 L 82.50 43.25 L 82.23 43.50" stroke="#2ecc71" stroke-width="0.03" fill="none"/>
+    
+    <!-- Day 4: 巩留 - 那拉提 - 新源 -->
+    <path d="M 82.23 43.50 L 83.60 43.30 L 83.23 43.40" stroke="#f39c12" stroke-width="0.03" fill="none"/>
+    
+    <!-- Day 5: 新源 - 蜂蜜小镇 - 乔尔玛 - 蜂蜜小镇 - 仙女湖 -->
+    <path d="M 83.23 43.40 L 82.80 43.80 L 84.00 43.65 L 82.80 43.80 L 83.65 43.35" stroke="#9b59b6" stroke-width="0.03" fill="none"/>
+    
+    <!-- Day 6: 仙女湖 - 伊宁 - 乌鲁木齐 -->
+    <path d="M 83.65 43.35 L 81.33 43.91 L 87.62 43.83" stroke="#1abc9c" stroke-width="0.03" fill="none"/>
+    
+    <!-- Locations -->
+    <circle cx="81.33" cy="43.91" r="0.05" fill="#e74c3c"/>
+    <circle cx="81.20" cy="44.50" r="0.05" fill="#e74c3c"/>
+    <circle cx="81.18" cy="44.45" r="0.05" fill="#e74c3c"/>
+    <circle cx="82.20" cy="43.10" r="0.05" fill="#3498db"/>
+    <circle cx="81.83" cy="43.20" r="0.05" fill="#3498db"/>
+    <circle cx="82.50" cy="43.25" r="0.05" fill="#2ecc71"/>
+    <circle cx="82.23" cy="43.50" r="0.05" fill="#2ecc71"/>
+    <circle cx="83.60" cy="43.30" r="0.05" fill="#f39c12"/>
+    <circle cx="83.23" cy="43.40" r="0.05" fill="#f39c12"/>
+    <circle cx="82.80" cy="43.80" r="0.05" fill="#9b59b6"/>
+    <circle cx="84.00" cy="43.65" r="0.05" fill="#9b59b6"/>
+    <circle cx="83.65" cy="43.35" r="0.05" fill="#9b59b6"/>
+    <circle cx="87.62" cy="43.83" r="0.05" fill="#1abc9c"/>
+  </g>
+  
+  <!-- Labels (in original coordinate system) -->
+  <g font-size="14" fill="#2c3e50">
+    <text x="100" y="500">行程路线（按天区分颜色）：</text>
+    <text x="100" y="525"><tspan fill="#e74c3c">■</tspan> 5.1 伊宁 - 赛里木湖 - 果子沟大桥 - 伊宁</text>
+    <text x="100" y="545"><tspan fill="#3498db">■</tspan> 5.2 伊宁 - 喀拉峻 - 特克斯</text>
+    <text x="100" y="565"><tspan fill="#2ecc71">■</tspan> 5.3 特克斯 - 库尔德宁 - 巩留</text>
+    <text x="380" y="525"><tspan fill="#f39c12">■</tspan> 5.4 巩留 - 那拉提 - 新源</text>
+    <text x="380" y="545"><tspan fill="#9b59b6">■</tspan> 5.5 新源 - 蜂蜜小镇 - 乔尔玛 - 仙女湖</text>
+    <text x="380" y="565"><tspan fill="#1abc9c">■</tspan> 5.6 仙女湖 - 伊宁 - 乌鲁木齐</text>
+  </g>
+  
+  <!-- Location labels -->
+  <g font-size="12" fill="#2c3e50" font-weight="bold">
+    <text x="106" y="186">伊宁</text>
+    <text x="96" y="105">赛里木湖</text>
+    <text x="95" y="110">果子沟大桥</text>
+    <text x="177" y="223">喀拉峻</text>
+    <text x="145" y="175">特克斯</text>
+    <text x="205" y="215">库尔德宁</text>
+    <text x="180" y="190">巩留</text>
+    <text x="285" y="210">那拉提</text>
+    <text x="258" y="198">新源</text>
+    <text x="225" y="160">蜂蜜小镇</text>
+    <text x="315" y="178">乔尔玛</text>
+    <text x="290" y="205">仙女湖</text>
+    <text x="618" y="160">乌鲁木齐</text>
+  </g>
+</svg>

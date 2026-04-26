@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business English Phrases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .stats {
+            text-align: center;
+            color: #667eea;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 40px 20px;
+            margin-bottom: 20px;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phrase {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .meaning {
+            font-size: 22px;
+            color: #4a5568;
+            text-align: center;
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 0.3s;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .meaning.show {
+            opacity: 1;
+            max-height: 300px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-show {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-show:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-next {
+            background: #764ba2;
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: #65418a;
+            transform: translateY(-2px);
+        }
+
+        .btn-review {
+            background: #f0932b;
+            color: white;
+        }
+
+        .btn-review:hover {
+            background: #d98324;
+            transform: translateY(-2px);
+        }
+
+        .btn-review.active {
+            background: #e74c3c;
+        }
+
+        .btn-bookmark {
+            background: #e17055;
+            color: white;
+        }
+
+        .btn-bookmark:hover {
+            background: #d15a40;
+            transform: translateY(-2px);
+        }
+
+        .btn-bookmark.active {
+            background: #2ecc71;
+        }
+
+        .counter {
+            text-align: center;
+            color: #888;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .review-mode {
+            text-align: center;
+            color: #e74c3c;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 15px;
+            }
+            .phrase {
+                font-size: 20px;
+            }
+            .meaning {
+                font-size: 18px;
+            }
+            buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Business English Phrases</h1>
+        <p class="subtitle">商务英语常用语句 - 点击显示翻译，下一句</p>
+        <div class="stats" id="stats">回锅肉: 0 句</div>
+        
+        <div class="card">
+            <div class="phrase" id="phrase">-</div>
+            <div class="meaning" id="meaning">-</div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn-show" id="showBtn">显示翻译</button>
+            <button class="btn-next" id="nextBtn">下一句</button>
+            <button class="btn-bookmark" id="bookmarkBtn">加入回锅肉</button>
+            <button class="btn-review" id="reviewBtn">只复习回锅肉</button>
+        </div>
+
+        <div class="counter">
+            <span id="counter">1 / 100</span>
+        </div>
+        <div class="review-mode" id="reviewMode"></div>
+    </div>
+
+    <script>
+        // Common Business English Phrases with Chinese meanings
+        const businessPhrases = [
+            { phrase: "Could you follow up on this?", meaning: "你能跟进一下这件事吗？" },
+            { phrase: "Let's circle back to this later.", meaning: "我们稍后再讨论这个问题。" },
+            { phrase: "I'll get back to you on that.", meaning: "我稍后回复你。" },
+            { phrase: "Can we schedule a quick call?", meaning: "我们能安排一个短会吗？" },
+            { phrase: "What's the bottom line?", meaning: "最终结果是什么？底线是什么？" },
+            { phrase: "Let's think outside the box.", meaning: "我们换个思路/跳出框架思考。" },
+            { phrase: "We need to move the needle.", meaning: "我们需要取得实质性进展。" },
+            { phrase: "That's outside my scope.", meaning: "这超出了我的职责范围。" },
+            { phrase: "Let's align on this.", meaning: "我们在这点上达成一致。" },
+            { phrase: "Can you give me a ballpark figure?", meaning: "能给我一个大概的数字吗？" },
+            { phrase: "We need to hit the ground running.", meaning: "我们需要立刻开始行动。" },
+            { phrase: "Let's take this offline.", meaning: "我们会后私下讨论。" },
+            { phrase: "Can you touch base with me tomorrow?", meaning: "明天能和我联系一下吗？" },
+            { phrase: "It's a win-win situation.", meaning: "这是一个双赢局面。" },
+            { phrase: "We need to ramp up production.", meaning: "我们需要扩大生产。" },
+            { phrase: "What are the key takeaways?", meaning: "主要收获/结论是什么？" },
+            { phrase: "Let's leverage our strengths.", meaning: "我们要发挥我们的优势。" },
+            { phrase: "I need to run this by my manager.", meaning: "我需要让经理过目/批准。" },
+            { phrase: "We're on the same page.", meaning: "我们意见一致。" },
+            { phrase: "Can you push the deadline back?", meaning: "能推迟截止日期吗？" },
+            { phrase: "We need to close the loop.", meaning: "我们需要闭环/完成整个流程。" },
+            { phrase: "It's low-hanging fruit.", meaning: "这是唾手可得的成果/容易做到的事。" },
+            { phrase: "Let's bite the bullet.", meaning: "我们硬着头皮做这件难事吧。" },
+            { phrase: "We need to prioritize.", meaning: "我们需要分轻重缓急。" },
+            { phrase: "Can you go the extra mile?", meaning: "你能多付出一些努力吗？" },
+            { phrase: "Let's cut to the chase.", meaning: "我们开门见山，直说重点。" },
+            { phrase: "The ball is in your court.", meaning: "现在轮到你了/看你下一步。" },
+            { phrase: "We need to crunch the numbers.", meaning: "我们需要计算一下数据。" },
+            { phrase: "It's a game-changer.", meaning: "这改变了整个局面。" },
+            { phrase: "Can we have a kickoff meeting?", meaning: "我们能开启动会吗？" },
+            { phrase: "We need to stay on track.", meaning: "我们需要保持进度不偏离。" },
+            { phrase: "What's the ROI?", meaning: "投资回报率是多少？" },
+            { phrase: "Let's action this immediately.", meaning: "我们立刻执行这件事。" },
+            { phrase: "We're facing a steep learning curve.", meaning: "我们需要学习很多新知识，上手不容易。" },
+            { phrase: "Can you forward this to the relevant stakeholders?", meaning: "能转发给相关利益方吗？" },
+            { phrase: "We need to manage expectations.", meaning: "我们需要管理大家的预期。" },
+            { phrase: "This is out of my bandwidth right now.", meaning: "我现在太忙，没时间处理这个。" },
+            { phrase: "Let's deep dive into this topic.", meaning: "我们深入探讨这个话题。" },
+            { phrase: "We need to hit our KPIs.", meaning: "我们需要完成关键绩效指标。" },
+            { phrase: "Can you give me some context?", meaning: "能给我介绍一下背景吗？" },
+            { phrase: "We need to future-proof our business.", meaning: "我们需要让业务面向未来，适应未来变化。" },
+            { phrase: "It's a paradigm shift.", meaning: "这是范式转变，思维模式的根本改变。" },
+            { phrase: "Let's keep this on the radar.", meaning: "我们持续关注这件事。" },
+            { phrase: "We need to pivot.", meaning: "我们需要改变方向/战略转型。" },
+            { phrase: "Can you escalate this to the leadership?", meaning: "能把这件事升级给领导层吗？" },
+            { phrase: "We are operating at full capacity.", meaning: "我们已经满负荷运转了。" },
+            { phrase: "What's the value proposition?", meaning: "价值主张是什么？" },
+            { phrase: "Let's sync up next week.", meaning: "我们下周同步一下进度。" },
+            { phrase: "We have a lot on our plate right now.", meaning: "我们现在有很多事要做。" },
+            { phrase: "It's a force multiplier.", meaning: "这是力量倍增器，能放大效果。" },
+            { phrase: "Can we get this on the agenda?", meaning: "能把这件事放上议程吗？" },
+            { phrase: "We need to walk the talk.", meaning: "我们需要言行一致。" },
+            { phrase: "What's the OKR for this quarter?", meaning: "本季度目标与关键成果是什么？" },
+            { phrase: "We need to iterate quickly.", meaning: "我们需要快速迭代。" },
+            { phrase: "Can you socialize this idea internally?", meaning: "能在内部推广这个想法吗？" },
+            { phrase: "We're behind schedule.", meaning: "我们进度落后了。" },
+            { phrase: "Let's blue sky this for a moment.", meaning: "我们先敞开想象力 brainstorm。" },
+            { phrase: "We need to de-risk this project.", meaning: "我们需要降低项目风险。" },
+            { phrase: "It's a proof of concept.", meaning: "这是概念验证。" },
+            { phrase: "What's your elevator pitch?", meaning: "你能用简短几句话介绍一下吗？" },
+            { phrase: "We need to go to market.", meaning: "我们需要推出市场。" },
+            { phrase: "Can you drive this initiative?", meaning: "你能推动这个项目吗？" },
+            { phrase: "We need to harvest low-hanging fruit first.", meaning: "我们先摘低处的果子，先做容易见效的事。" },
+            { phrase: "It's a net positive.", meaning: "总体来说是好事。" },
+            { phrase: "Let's not boil the ocean.", meaning: "我们不要好高骛远，不要试图做不可能的事。" },
+            { phrase: "We need to bake this in.", meaning: "我们需要把这个内置进去/提前考虑进去。" },
+            { phrase: "Can you surface any issues?", meaning: "你能把问题摆到桌面上吗？" },
+            { phrase: "We're moving the goalposts.", meaning: "我们在改变目标/规则。" },
+            { phrase: "Let's get sign-off from legal.", meaning: "我们需要法务批准。" },
+            { phrase: "It's across the finish line.", meaning: "项目已经完成了。" },
+            { phrase: "We need to keep our options open.", meaning: "我们需要保持选择余地。" },
+            { phrase: "Can you cascade this information down?", meaning: "能把这个信息层层传递下去吗？" },
+            { phrase: "We need to flesh out the details.", meaning: "我们需要充实细节。" },
+            { phrase: "It's a sea change in the industry.", meaning: "行业发生了巨大变化。" },
+            { phrase: "Let's not boil the frog slowly.", meaning: "我们不要对慢慢变坏的情况无动于衷。" },
+            { phrase: "We need to get our ducks in a row.", meaning: "我们需要把一切安排得井井有条。" },
+            { phrase: "Can you give me a heads up?", meaning: "能提前给我打个招呼吗？" },
+            { phrase: "We're throwing money at the problem.", meaning: "我们只是在烧钱，没解决问题。" },
+            { phrase: "It's a cultural fit.", meaning: "文化契合。" },
+            { phrase: "We need to capture synergies.", meaning: "我们需要获取协同效应。" },
+            { phrase: "Let's not reinvent the wheel.", meaning: "我们不要重新发明轮子，不要做重复工作。" },
+            { phrase: "Can you put a stake in the ground?", meaning: "你能明确立场/设定目标吗？" },
+            { phrase: "We need to create a moat around our business.", meaning: "我们需要建立商业护城河。" },
+            { phrase: "It's a moving target.", meaning: "目标一直在变，很难对准。" },
+            { phrase: "We need to drink our own champagne.", meaning: "我们要自己吃狗粮，自己用自己的产品。" },
+            { phrase: "Let's open the kimono.", meaning: "我们坦诚公开信息。" },
+            { phrase: "We're pushing the envelope.", meaning: "我们在不断突破极限。" },
+            { phrase: "Can you connect the dots?", meaning: "你能把这些点联系起来，找出规律吗？" },
+            { phrase: "We need to fail fast.", meaning: "我们需要快速失败，快速试错。" },
+            { phrase: "It's a best practice.", meaning: "这是最佳实践。" },
+            { phrase: "Let's park this topic for now.", meaning: "我们先把这个话题放一放。" },
+            { phrase: "We need to get buy-in from the board.", meaning: "我们需要得到董事会的批准和支持。" },
+            { phrase: "Can you give me more bandwidth on this?", meaning: "你能多花点时间处理这个吗？" },
+            { phrase: "We're in a holding pattern.", meaning: "我们暂时停滞等待。" },
+            { phrase: "It's a greenfield project.", meaning: "这是一个全新项目，从零开始。" },
+            { phrase: "We need to map out the journey.", meaning: "我们需要规划路线图。" },
+            { phrase: "Let's square this away before we leave.", meaning: "我们离开前把这件事解决好。" },
+            { phrase: "What gets measured gets managed.", meaning: "可衡量才能管理。" },
+            { phrase: "If you can't measure it you can't improve it.", meaning: "无法衡量就无法改进。" },
+            { phrase: "Culture eats strategy for breakfast.", meaning: "文化比战略更重要。" }
+        ];
+
+        let currentIndex = 0;
+        let reviewMode = false;
+        let bookmarks = JSON.parse(localStorage.getItem('businessPhrasesBookmarks') || '[]');
+        let shuffledPhrases = shuffleArray([...businessPhrases]);
+
+        // 随机打乱数组
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 获取当前列表
+        function getCurrentList() {
+            return reviewMode && bookmarks.length > 0 
+                ? bookmarks.map(idx => businessPhrases[idx])
+                : shuffledPhrases;
+        }
+
+        // 更新统计显示
+        function updateStats() {
+            const statsEl = document.getElementById('stats');
+            statsEl.textContent = `回锅肉: ${bookmarks.length} 句`;
+        }
+
+        // 更新按钮状态
+        function updateBookmarkButton() {
+            const btn = document.getElementById('bookmarkBtn');
+            const currentList = getCurrentList();
+            const currentPhrase = currentList[currentIndex];
+            const originalIndex = businessPhrases.findIndex(p => p.phrase === currentPhrase.phrase);
+            const isBookmarked = bookmarks.includes(originalIndex);
+
+            if (isBookmarked) {
+                btn.textContent = '移出回锅肉';
+                btn.classList.add('active');
+            } else {
+                btn.textContent = '加入回锅肉';
+                btn.classList.remove('active');
+            }
+        }
+
+        // 更新review模式显示
+        function updateReviewModeDisplay() {
+            const el = document.getElementById('reviewMode');
+            if (reviewMode && bookmarks.length > 0) {
+                el.textContent = '⚠️ 当前只复习回锅肉中的句子';
+            } else {
+                el.textContent = '';
+            }
+        }
+
+        function showCurrentPhrase() {
+            const phraseEl = document.getElementById('phrase');
+            const meaningEl = document.getElementById('meaning');
+            const counterEl = document.getElementById('counter');
+            const currentList = getCurrentList();
+
+            const item = currentList[currentIndex];
+            phraseEl.textContent = item.phrase;
+            meaningEl.textContent = item.meaning;
+            meaningEl.classList.remove('show');
+            counterEl.textContent = `${currentIndex + 1} / ${currentList.length}`;
+
+            updateBookmarkButton();
+            updateStats();
+            updateReviewModeDisplay();
+        }
+
+        function showMeaning() {
+            const meaningEl = document.getElementById('meaning');
+            meaningEl.classList.add('show');
+        }
+
+        function nextPhrase() {
+            const currentList = getCurrentList();
+            currentIndex++;
+            if (currentIndex >= currentList.length) {
+                currentIndex = 0;
+                if (reviewMode && bookmarks.length > 0) {
+                    // 在复习模式下，重新打乱回锅肉
+                    alert('已经完成一轮回锅肉复习！已重新打乱顺序。');
+                    bookmarks = shuffleArray([...bookmarks]);
+                } else {
+                    // 正常模式下，重新打乱全部
+                    alert('已经完成一轮！已重新打乱顺序开始新一轮。');
+                    shuffledPhrases = shuffleArray([...businessPhrases]);
+                }
+            }
+            showCurrentPhrase();
+        }
+
+        // 切换书签
+        function toggleBookmark() {
+            const currentList = getCurrentList();
+            const currentPhrase = currentList[currentIndex];
+            const originalIndex = businessPhrases.findIndex(p => p.phrase === currentPhrase.phrase);
+            const isBookmarked = bookmarks.includes(originalIndex);
+
+            if (isBookmarked) {
+                // 移出
+                bookmarks = bookmarks.filter(idx => idx !== originalIndex);
+            } else {
+                // 加入
+                bookmarks.push(originalIndex);
+            }
+
+            // 保存到localStorage
+            localStorage.setItem('businessPhrasesBookmarks', JSON.stringify(bookmarks));
+            updateBookmarkButton();
+            updateStats();
+
+            // 如果在复习模式且回锅肉空了，自动退出复习模式
+            if (reviewMode && bookmarks.length === 0) {
+                reviewMode = false;
+                document.getElementById('reviewBtn').classList.remove('active');
+                currentIndex = 0;
+            }
+
+            showCurrentPhrase();
+        }
+
+        // 切换复习模式
+        function toggleReviewMode() {
+            if (bookmarks.length === 0) {
+                alert('回锅肉还是空的！先把不熟悉的句子加入回锅肉再复习。');
+                return;
+            }
+
+            reviewMode = !reviewMode;
+            const btn = document.getElementById('reviewBtn');
+            
+            if (reviewMode) {
+                btn.classList.add('active');
+                btn.textContent = '退出复习模式';
+                // 打乱回锅肉
+                bookmarks = shuffleArray([...bookmarks]);
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '只复习回锅肉';
+            }
+
+            currentIndex = 0;
+            showCurrentPhrase();
+        }
+
+        // 事件绑定
+        document.getElementById('showBtn').addEventListener('click', showMeaning);
+        document.getElementById('nextBtn').addEventListener('click', nextPhrase);
+        document.getElementById('bookmarkBtn').addEventListener('click', toggleBookmark);
+        document.getElementById('reviewBtn').addEventListener('click', toggleReviewMode);
+
+        // 快捷键支持
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                // 空格切换显示/下一个
+                const meaningEl = document.getElementById('meaning');
+                if (!meaningEl.classList.contains('show')) {
+                    showMeaning();
+                } else {
+                    nextPhrase();
+                }
+                e.preventDefault();
+            }
+            if (e.key === 'Enter') {
+                nextPhrase();
+            }
+            if (e.key === 's') {
+                showMeaning();
+            }
+            if (e.key === 'b') {
+                toggleBookmark();
+            }
+            if (e.key === 'r') {
+                toggleReviewMode();
+            }
+        });
+
+        // 初始显示第一个
+        updateStats();
+        showCurrentPhrase();
+    </script>
+</body>
+</html>

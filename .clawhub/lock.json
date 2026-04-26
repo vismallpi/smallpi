@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "skills": {
+    "taobao-detail-query": {
+      "version": "1.0.5",
+      "installedAt": 1775228288480
+    },
+    "speech-writer": {
+      "version": "1.0.0",
+      "installedAt": 1775375279572
+    }
+  }
+}

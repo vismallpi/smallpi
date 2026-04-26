@@ -1,0 +1,263 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" font-family="'Comic Neue', 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif">
+  <defs>
+    <!-- 箭头定义 -->
+    <marker id="arrow-solid" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#e67e22"/>
+    </marker>
+    <marker id="arrow-dash" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#f39c12"/>
+    </marker>
+    <marker id="arrow-return" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#95a5a6"/>
+    </marker>
+    
+    <!-- 背景渐变 -->
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdfbf7"/>
+      <stop offset="100%" stop-color="#f5f0e8"/>
+    </linearGradient>
+    
+    <!-- 柔和阴影 -->
+    <filter id="soft-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="3" stdDeviation="4" flood-color="#d4c5a9" flood-opacity="0.4"/>
+    </filter>
+    <filter id="light-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+      <feMerge>
+        <feMergeNode in="offsetblur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="700" fill="url(#bg)"/>
+  
+  <!-- 背景装饰：淡淡的山脉轮廓 -->
+  <path d="M0,620 Q100,580 180,600 Q260,560 350,590 Q450,550 580,585 Q680,560 800,590 L800,700 L0,700 Z" fill="#e8e0d0" opacity="0.4"/>
+  <path d="M0,640 Q150,610 280,630 Q400,600 550,625 Q680,605 800,630 L800,700 L0,700 Z" fill="#ddd2be" opacity="0.3"/>
+
+  <!-- ==================== 主路线图（环线布局） ==================== -->
+  
+  <!--
+    环线布局构思（伊宁作为起终点放在下方中央）：
+    伊宁 (400, 580)
+    赛里木湖 (200, 280)  — 左上方
+    果子沟大桥 (280, 320) — 赛湖右下方
+    喀拉峻 (320, 480)  — 左中偏下
+    特克斯 (380, 500)  — 八卦城
+    库尔德宁 (480, 460)
+    巩留 (520, 500)
+    那拉提 (620, 360)
+    乔尔玛/唐布拉 (580, 220)
+  -->
+  
+  <!-- 主路线连线（顺时针环线） -->
+  <!-- D1: 伊宁 → 赛里木湖 → 果子沟大桥 → 伊宁（原路返回） -->
+  <!-- 伊宁 → 赛里木湖 -->
+  <path d="M400,560 Q280,520 220,400 Q190,330 200,280" 
+        stroke="#e67e22" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+  <!-- 赛里木湖 → 果子沟大桥 -->
+  <path d="M200,280 Q240,300 280,320" 
+        stroke="#e67e22" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+  <!-- 果子沟大桥 → 伊宁（虚线返程） -->
+  <path d="M280,320 Q320,400 350,480 Q370,530 400,560" 
+        stroke="#95a5a6" stroke-width="2.5" stroke-dasharray="8,6" fill="none" stroke-linecap="round" marker-end="url(#arrow-return)"/>
+
+  <!-- D2: 伊宁 → 喀拉峻 → 特克斯 -->
+  <path d="M400,560 Q360,530 330,490 Q315,475 320,460" 
+        stroke="#2ecc71" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+  <path d="M320,460 Q350,485 380,500" 
+        stroke="#2ecc71" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+
+  <!-- D3: 特克斯 → 库尔德宁 → 巩留 -->
+  <path d="M380,500 Q430,490 470,470" 
+        stroke="#3498db" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+  <path d="M470,470 Q495,490 520,500" 
+        stroke="#3498db" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+
+  <!-- D4: 巩留 → 那拉提 -->
+  <path d="M520,500 Q570,450 610,400 Q625,375 620,360" 
+        stroke="#9b59b6" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+
+  <!-- D5: 那拉提 → 乔尔玛/唐布拉（原路往返） -->
+  <path d="M620,360 Q600,300 590,260 Q580,230 580,220" 
+        stroke="#e74c3c" stroke-width="3.5" fill="none" stroke-linecap="round" marker-end="url(#arrow-solid)"/>
+  <!-- 那拉提 → 乔尔玛 往返虚线 -->
+  <path d="M580,220 Q590,250 600,290 Q610,330 620,360" 
+        stroke="#95a5a6" stroke-width="2.5" stroke-dasharray="8,6" fill="none" stroke-linecap="round" marker-end="url(#arrow-return)"/>
+
+  <!-- 返回伊宁（D5结束返回） -->
+  <path d="M620,360 Q550,450 480,520 Q440,550 400,560" 
+        stroke="#95a5a6" stroke-width="2.5" stroke-dasharray="8,6" fill="none" stroke-linecap="round" marker-end="url(#arrow-return)"/>
+
+
+  <!-- ==================== 节点圆点 ==================== -->
+  
+  <!-- 伊宁（起终点-大圆） -->
+  <circle cx="400" cy="560" r="16" fill="#2c3e50" stroke="#fff" stroke-width="3" filter="url(#soft-shadow)"/>
+  <text x="400" y="565" text-anchor="middle" font-size="11" fill="#fff" font-weight="bold">伊宁</text>
+  <text x="400" y="510" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">起终点</text>
+
+  <!-- 赛里木湖 -->
+  <circle cx="200" cy="280" r="14" fill="#3498db" stroke="#fff" stroke-width="2.5" filter="url(#soft-shadow)"/>
+  <text x="200" y="255" text-anchor="middle" font-size="11" fill="#2c3e50" font-weight="bold">赛里木湖</text>
+  <text x="200" y="300" text-anchor="middle" font-size="9" fill="#2980b9">✨ 大西洋最后一滴眼泪</text>
+
+  <!-- 果子沟大桥 -->
+  <circle cx="280" cy="320" r="10" fill="#3498db" stroke="#fff" stroke-width="2" filter="url(#soft-shadow)"/>
+  <text x="280" y="335" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">果子沟大桥</text>
+
+  <!-- 喀拉峻 -->
+  <circle cx="320" cy="460" r="12" fill="#27ae60" stroke="#fff" stroke-width="2.5" filter="url(#soft-shadow)"/>
+  <text x="285" y="450" text-anchor="end" font-size="11" fill="#2c3e50" font-weight="bold">喀拉峻</text>
+  <text x="285" y="465" text-anchor="end" font-size="9" fill="#27ae60">草原之王</text>
+
+  <!-- 特克斯八卦城 -->
+  <circle cx="380" cy="500" r="12" fill="#27ae60" stroke="#fff" stroke-width="2.5" filter="url(#soft-shadow)"/>
+  <text x="380" y="485" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">特克斯</text>
+  <text x="380" y="520" text-anchor="middle" font-size="8" fill="#27ae60">八卦城</text>
+
+  <!-- 库尔德宁 -->
+  <circle cx="470" cy="470" r="10" fill="#f39c12" stroke="#fff" stroke-width="2" filter="url(#soft-shadow)"/>
+  <text x="470" y="457" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">库尔德宁</text>
+
+  <!-- 巩留 -->
+  <circle cx="520" cy="500" r="11" fill="#f39c12" stroke="#fff" stroke-width="2.5" filter="url(#soft-shadow)"/>
+  <text x="520" y="518" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">巩留</text>
+
+  <!-- 那拉提 -->
+  <circle cx="620" cy="360" r="14" fill="#8e44ad" stroke="#fff" stroke-width="2.5" filter="url(#soft-shadow)"/>
+  <text x="620" y="340" text-anchor="middle" font-size="11" fill="#2c3e50" font-weight="bold">那拉提</text>
+  <text x="620" y="378" text-anchor="middle" font-size="9" fill="#8e44ad">空中草原</text>
+
+  <!-- 乔尔玛/唐布拉 -->
+  <circle cx="580" cy="220" r="13" fill="#e74c3c" stroke="#fff" stroke-width="2.5" filter="url(#soft-shadow)"/>
+  <text x="580" y="200" text-anchor="middle" font-size="11" fill="#2c3e50" font-weight="bold">乔尔玛</text>
+  <text x="580" y="238" text-anchor="middle" font-size="9" fill="#e74c3c">唐布拉百里画廊</text>
+
+
+  <!-- ==================== 车程标注 ==================== -->
+  
+  <!-- D1 车程 -->
+  <g transform="translate(280, 430) rotate(-15)">
+    <rect x="-35" y="-12" width="70" height="20" rx="10" fill="#fef9e7" stroke="#e67e22" stroke-width="1.2"/>
+    <text x="0" y="3" text-anchor="middle" font-size="9" fill="#e67e22">🚗 236km/3h</text>
+  </g>
+  
+  <!-- 赛湖→果子沟 -->
+  <g transform="translate(245, 295) rotate(10)">
+    <rect x="-30" y="-10" width="60" height="18" rx="9" fill="#fef9e7" stroke="#e67e22" stroke-width="1"/>
+    <text x="0" y="2" text-anchor="middle" font-size="8" fill="#e67e22">约50km/1h</text>
+  </g>
+
+  <!-- D2 伊宁→喀拉峻 -->
+  <g transform="translate(360, 535) rotate(12)">
+    <rect x="-30" y="-10" width="60" height="18" rx="9" fill="#e8f8f5" stroke="#2ecc71" stroke-width="1"/>
+    <text x="0" y="2" text-anchor="middle" font-size="8" fill="#27ae60">110km/2h</text>
+  </g>
+  
+  <!-- 喀拉峻→特克斯 -->
+  <g transform="translate(355, 480) rotate(-8)">
+    <rect x="-25" y="-10" width="50" height="18" rx="9" fill="#e8f8f5" stroke="#2ecc71" stroke-width="1"/>
+    <text x="0" y="2" text-anchor="middle" font-size="8" fill="#27ae60">41km/1h</text>
+  </g>
+
+  <!-- D3 特克斯→库尔德宁 -->
+  <g transform="translate(430, 480) rotate(0)">
+    <rect x="-35" y="-10" width="70" height="18" rx="9" fill="#ebf5fb" stroke="#3498db" stroke-width="1"/>
+    <text x="0" y="2" text-anchor="middle" font-size="8" fill="#2980b9">约100km/2h</text>
+  </g>
+  
+  <!-- 库尔德宁→巩留 -->
+  <g transform="translate(500, 480) rotate(-10)">
+    <rect x="-30" y="-10" width="60" height="18" rx="9" fill="#ebf5fb" stroke="#3498db" stroke-width="1"/>
+    <text x="0" y="2" text-anchor="middle" font-size="8" fill="#2980b9">50km/1h</text>
+  </g>
+
+  <!-- D4 巩留→那拉提 -->
+  <g transform="translate(570, 445) rotate(-20)">
+    <rect x="-40" y="-12" width="80" height="20" rx="10" fill="#f4ecf7" stroke="#9b59b6" stroke-width="1.2"/>
+    <text x="0" y="3" text-anchor="middle" font-size="9" fill="#8e44ad">🚗 155km/2.5h</text>
+  </g>
+
+  <!-- D5 那拉提→乔尔玛 -->
+  <g transform="translate(610, 295) rotate(-15)">
+    <rect x="-40" y="-12" width="80" height="20" rx="10" fill="#fdedec" stroke="#e74c3c" stroke-width="1.2"/>
+    <text x="0" y="3" text-anchor="middle" font-size="9" fill="#e74c3c">🚗 145km/2h</text>
+  </g>
+
+
+  <!-- ==================== 每日行程卡片（右侧） ==================== -->
+  
+  <!-- D1 卡片 -->
+  <g transform="translate(655, 440)">
+    <rect x="0" y="0" width="130" height="38" rx="10" fill="#fef9e7" stroke="#e67e22" stroke-width="1.5" filter="url(#light-glow)"/>
+    <text x="10" y="16" font-size="9" fill="#e67e22" font-weight="bold">Day 1</text>
+    <text x="10" y="30" font-size="8" fill="#7f8c8d">赛里木湖 · 果子沟大桥</text>
+  </g>
+
+  <!-- D2 卡片 -->
+  <g transform="translate(655, 485)">
+    <rect x="0" y="0" width="130" height="38" rx="10" fill="#e8f8f5" stroke="#2ecc71" stroke-width="1.5" filter="url(#light-glow)"/>
+    <text x="10" y="16" font-size="9" fill="#27ae60" font-weight="bold">Day 2</text>
+    <text x="10" y="30" font-size="8" fill="#7f8c8d">喀拉峻草原 · 八卦城</text>
+  </g>
+
+  <!-- D3 卡片 -->
+  <g transform="translate(655, 530)">
+    <rect x="0" y="0" width="130" height="38" rx="10" fill="#ebf5fb" stroke="#3498db" stroke-width="1.5" filter="url(#light-glow)"/>
+    <text x="10" y="16" font-size="9" fill="#2980b9" font-weight="bold">Day 3</text>
+    <text x="10" y="30" font-size="8" fill="#7f8c8d">库尔德宁 · 巩留</text>
+  </g>
+
+  <!-- D4 卡片 -->
+  <g transform="translate(655, 575)">
+    <rect x="0" y="0" width="130" height="38" rx="10" fill="#f4ecf7" stroke="#9b59b6" stroke-width="1.5" filter="url(#light-glow)"/>
+    <text x="10" y="16" font-size="9" fill="#8e44ad" font-weight="bold">Day 4</text>
+    <text x="10" y="30" font-size="8" fill="#7f8c8d">那拉提草原 · 新源</text>
+  </g>
+
+  <!-- D5 卡片 -->
+  <g transform="translate(655, 620)">
+    <rect x="0" y="0" width="130" height="38" rx="10" fill="#fdedec" stroke="#e74c3c" stroke-width="1.5" filter="url(#light-glow)"/>
+    <text x="10" y="16" font-size="9" fill="#e74c3c" font-weight="bold">Day 5</text>
+    <text x="10" y="30" font-size="8" fill="#7f8c8d">乔尔玛 · 唐布拉</text>
+  </g>
+
+
+  <!-- ==================== 图例 / 说明 ==================== -->
+  
+  <g transform="translate(30, 610)">
+    <rect x="0" y="0" width="200" height="70" rx="12" fill="white" stroke="#d5cfc0" stroke-width="1" opacity="0.92"/>
+    <text x="15" y="20" font-size="10" fill="#2c3e50" font-weight="bold">📌 图例</text>
+    
+    <line x1="15" y1="38" x2="45" y2="38" stroke="#e67e22" stroke-width="3" stroke-linecap="round"/>
+    <text x="52" y="42" font-size="9" fill="#5d6d7e">主路线（去程）</text>
+    
+    <line x1="15" y1="55" x2="45" y2="55" stroke="#95a5a6" stroke-width="2" stroke-dasharray="6,4" stroke-linecap="round"/>
+    <text x="52" y="59" font-size="9" fill="#5d6d7e">返程 / 虚线路段</text>
+  </g>
+
+  <!-- 底部标题 -->
+  <text x="400" y="685" text-anchor="middle" font-size="13" fill="#bdc3c7" letter-spacing="2">新疆伊犁 · 5日自驾环线</text>
+  
+  <!-- 顶部大标题 -->
+  <g transform="translate(400, 48)">
+    <text x="0" y="0" text-anchor="middle" font-size="22" fill="#2c3e50" font-weight="bold" letter-spacing="3">🚗 新疆伊犁 · 5日自驾环线</text>
+    <text x="0" y="22" text-anchor="middle" font-size="12" fill="#7f8c8d" letter-spacing="1">伊宁出发 · 赛里木湖 · 喀拉峻 · 库尔德宁 · 那拉提 · 唐布拉 · 返回伊宁</text>
+  </g>
+
+  <!-- 虚线标注图案说明 -->
+  <g transform="translate(400, 90)">
+    <line x1="-80" y1="0" x2="-30" y2="0" stroke="#95a5a6" stroke-width="2" stroke-dasharray="8,6"/>
+    <text x="-20" y="4" font-size="9" fill="#95a5a6">虚线 = 返程 / 原路返回住宿地</text>
+  </g>
+
+  <!-- 装饰: 小花朵/草原元素 -->
+  <circle cx="150" cy="500" r="3" fill="#f1c40f" opacity="0.5"/>
+  <circle cx="170" cy="520" r="2" fill="#e74c3c" opacity="0.4"/>
+  <circle cx="130" cy="540" r="2.5" fill="#2ecc71" opacity="0.4"/>
+  <circle cx="650" cy="200" r="2" fill="#f1c40f" opacity="0.5"/>
+  <circle cx="670" cy="220" r="2.5" fill="#e74c3c" opacity="0.4"/>
+</svg>
