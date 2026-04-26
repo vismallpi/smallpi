@@ -268,6 +268,7 @@
             font-weight: 700;
             color: #2eaadc;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         .modal-task-name {
@@ -278,6 +279,7 @@
             word-break: break-word;
             padding-bottom: 8px;
             border-bottom: 1px solid #f0f0f0;
+            text-align: center;
         }
 
         .modal-buttons {
@@ -313,6 +315,42 @@
 
         .modal-btn-confirm:hover {
             background-color: #289fc7;
+        }
+
+        /* 已完成任务分组收缩 */
+        .date-group {
+            margin-bottom: 24px;
+        }
+
+        .date-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #9b9a97;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .date-group-header .toggle-icon {
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .date-group-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .date-group-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .date-group-header.collapsed + .date-group-content {
+            max-height: 0;
+            opacity: 0;
         }
 
         /* 移动端适配 */
@@ -359,7 +397,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.2.0 - 移动端整体样式美化 · 自定义底部弹窗确认 · 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.2.1 - 已完成任务默认收缩 · 弹窗文字居中 · 移动端整体样式美化 · 自定义底部弹窗确认 · 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -437,23 +475,87 @@ async function renderTasks() {
         return;
     }
 
-    // 未完成排在前面，完成排在后面
-    const sortedTasks = tasks.sort((a, b) => {
-        if (a.completed === b.completed) {
-            // 都完成或都未完成，按创建时间降序
-            return b.id.localeCompare(a.id);
+    // 按日期分组（创建日期 YYYY-MM-DD）
+    const tasksByDate = {};
+    tasks.forEach(task => {
+        // task.id 是毫秒时间戳，转换为日期
+        const date = new Date(parseInt(task.id));
+        const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+        if (!tasksByDate[dateStr]) {
+            tasksByDate[dateStr] = {
+                incomplete: [],
+                complete: []
+            };
         }
-        // 未完成排在前面
-        return a.completed ? 1 : -1;
+        if (task.completed) {
+            tasksByDate[dateStr].complete.push(task);
+        } else {
+            tasksByDate[dateStr].incomplete.push(task);
+        }
     });
 
     emptyStateEl.style.display = 'none';
     taskListEl.innerHTML = '';
 
-    sortedTasks.forEach(task => {
-        const taskEl = createTaskElement(task);
-        taskListEl.appendChild(taskEl);
+    // 按日期从新到旧排序
+    const sortedDates = Object.keys(tasksByDate).sort().reverse();
+
+    sortedDates.forEach(dateStr => {
+        const group = tasksByDate[dateStr];
+        const dateGroupEl = document.createElement('div');
+        dateGroupEl.className = 'date-group';
+
+        // 只显示日期，格式化更友好
+        const displayDate = new Date(dateStr).toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+        });
+
+        // 日期分组头部
+        const dateHeaderHtml = `
+            <div class="date-header">${displayDate}</div>
+        `;
+        dateGroupEl.innerHTML = dateHeaderHtml;
+
+        // 未完成任务列表（一直展开）
+        if (group.incomplete.length > 0) {
+            const incompleteList = document.createElement('div');
+            incompleteList.className = 'task-list';
+            group.incomplete.forEach(task => {
+                const taskEl = createTaskElement(task);
+                incompleteList.appendChild(taskEl);
+            });
+            dateGroupEl.appendChild(incompleteList);
+        }
+
+        // 已完成任务列表（默认收缩）
+        if (group.complete.length > 0) {
+            const completeHeader = document.createElement('div');
+            completeHeader.className = 'date-group-header collapsed';
+            completeHeader.innerHTML = `
+                <span>已完成 (${group.complete.length})</span>
+                <span class="toggle-icon">▾</span>
+            `;
+            completeHeader.addEventListener('click', () => {
+                completeHeader.classList.toggle('collapsed');
+            });
+
+            const completeList = document.createElement('div');
+            completeList.className = 'date-group-content task-list';
+            group.complete.forEach(task => {
+                const taskEl = createTaskElement(task);
+                completeList.appendChild(taskEl);
+            });
+
+            dateGroupEl.appendChild(completeHeader);
+            dateGroupEl.appendChild(completeList);
+        }
+
+        taskListEl.appendChild(dateGroupEl);
     });
+
     console.log('Render complete');
 }
 
