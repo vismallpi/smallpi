@@ -17,64 +17,73 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            background-color: #ffffff;
+            background-color: #f7f6f3;
             color: #37352f;
-            line-height: 1.6;
+            line-height: 1.5;
+            min-height: 100vh;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 60px 20px;
+            padding: 30px 16px 60px;
         }
 
         h1 {
-            font-size: 42px;
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 40px;
+            margin-bottom: 36px;
             color: #37352f;
+            padding-top: 10px;
         }
 
         .version-info {
-            font-size: 14px;
+            font-size: 12px;
             color: #9b9a97;
-            margin-bottom: 30px;
-            margin-top: -30px;
+            margin-bottom: 24px;
+            margin-top: -28px;
+            line-height: 1.4;
         }
 
         .add-task {
-            margin-bottom: 40px;
+            margin-bottom: 24px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
+            background-color: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
         }
 
         .add-task input {
             flex: 1;
-            min-width: 200px;
-            padding: 12px 16px;
+            min-width: 160px;
+            padding: 12px 14px;
             border: 1px solid #e9e9e7;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 16px;
-            background-color: #ffffff;
+            background-color: #fafafa;
             transition: border-color 0.2s;
         }
 
         .add-task input:focus {
             outline: none;
             border-color: #2eaadc;
+            background-color: #ffffff;
         }
 
         .add-task button {
-            padding: 12px 20px;
+            padding: 12px 18px;
             background-color: #2eaadc;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s;
+            min-height: 48px;
         }
 
         .add-task button:hover {
@@ -94,16 +103,27 @@
             letter-spacing: 0.5px;
         }
 
+        .task-list {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
         .task-item {
             display: flex;
             align-items: flex-start;
-            padding: 12px 0;
-            border-bottom: 1px solid #f7f6f3;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0ee;
             transition: background-color 0.2s;
         }
 
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
         .task-item:hover {
-            background-color: #f7f6f3;
+            background-color: #fafaf8;
         }
 
         .task-item.dragging {
@@ -117,7 +137,7 @@
 
         .drag-handle {
             cursor: grab;
-            padding: 0 5px;
+            padding: 0 6px;
             color: #ccc;
             font-size: 16px;
             align-self: center;
@@ -129,12 +149,12 @@
         }
 
         .task-checkbox {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border: 2px solid #e9e9e7;
-            border-radius: 2px;
+            border-radius: 50%;
             margin-right: 12px;
-            margin-top: 3px;
+            margin-top: 6px;
             cursor: pointer;
             flex-shrink: 0;
             position: relative;
@@ -152,7 +172,7 @@
             content: '✓';
             position: absolute;
             color: white;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             top: 50%;
             left: 50%;
@@ -161,11 +181,13 @@
 
         .task-content {
             flex: 1;
+            padding: 2px 0;
         }
 
         .task-text {
-            font-size: 15px;
+            font-size: 16px;
             color: #37352f;
+            line-height: 1.4;
             transition: all 0.2s;
         }
 
@@ -206,42 +228,56 @@
             color: #ff4d4f;
         }
 
-        /* 自定义确认对话框样式 */
+        /* 自定义确认对话框样式 - 移动端优化 */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.55);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end;
             z-index: 9999;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
             background-color: #ffffff;
-            border-radius: 8px;
-            padding: 24px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 16px 16px 0 0;
+            padding: 20px 20px 24px;
+            width: 100%;
+            max-width: 100%;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.2s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
 
         .modal-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
-            color: #eb5424;
-            margin-bottom: 12px;
+            color: #2eaadc;
+            margin-bottom: 10px;
         }
 
         .modal-task-name {
             font-size: 15px;
             color: #37352f;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             line-height: 1.5;
             word-break: break-word;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .modal-buttons {
@@ -251,12 +287,14 @@
         }
 
         .modal-btn {
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 15px;
             cursor: pointer;
             border: none;
             transition: background-color 0.2s;
+            min-height: 44px;
+            font-weight: 500;
         }
 
         .modal-btn-cancel {
@@ -275,6 +313,20 @@
 
         .modal-btn-confirm:hover {
             background-color: #289fc7;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 60px;
+            }
+            h1 {
+                font-size: 28px;
+                margin-bottom: 30px;
+            }
+            .add-task {
+                padding: 12px;
+            }
         }
 
         .empty-state {
@@ -307,7 +359,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.1.13 - 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.2.0 - 移动端整体样式美化 · 自定义底部弹窗确认 · 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
