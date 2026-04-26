@@ -385,6 +385,7 @@
         .date-group-header .toggle-icon {
             font-size: 18px;
             transition: transform 0.2s;
+            margin-right: 12px;
         }
 
         .date-group-header.collapsed .toggle-icon {
@@ -445,7 +446,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.4.2
+            v3.4.3
         </div>
         
         <div class="add-task">
@@ -590,8 +591,9 @@ async function renderTasks() {
     const completeHeader = document.createElement('div');
     completeHeader.className = 'date-group-header collapsed completed-header';
     completeHeader.innerHTML = `
-        <span>✓ Completed (${grouped.completed.length})</span>
         <span class="toggle-icon">▾</span>
+        <span>✓ Completed</span>
+        <span class="count-badge">${grouped.completed.length}</span>
     `;
     completeHeader.addEventListener('click', () => {
         completeHeader.classList.toggle('collapsed');

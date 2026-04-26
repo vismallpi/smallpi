@@ -26,8 +26,8 @@ This file stores important decisions, lessons learned, and key information that 
 - 问题修复记录：
   - v3.1.9 修复了 `API_BASE` 变量重复定义冲突，导致API调用失败不显示任务列表bug
 
-**最新版本：v3.4.2**
-最新改动：整体调整圆角为小圆角(2px)，细边框，简约线性图标，更接近现代简约设计风格
+**最新版本：v3.4.3**
+最新改动：Completed section 对齐布局调整：展开/收起图标放左侧，总数放右侧，和其他分组风格保持一致
 
 **开发规则（强制遵守）：**
 1. ✅ 每次改动代码，必须更新前端版本号（notion-style-todo.html 中显示）
