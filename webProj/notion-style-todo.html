@@ -446,7 +446,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.4.5
+            v3.4.6
         </div>
         
         <div class="add-task">
@@ -591,10 +591,13 @@ async function renderTasks() {
     const completeHeader = document.createElement('div');
     completeHeader.className = 'date-group-header collapsed completed-header';
     completeHeader.innerHTML = `
-        <span class="toggle-icon">▾</span>
         <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Completed</span>
         <span class="count-badge">${grouped.completed.length}</span>
     `;
+    // 点击勾选图标也能切换展开收起
+    completeHeader.addEventListener('click', () => {
+        completeHeader.classList.toggle('collapsed');
+    });
     completeHeader.addEventListener('click', () => {
         completeHeader.classList.toggle('collapsed');
     });
