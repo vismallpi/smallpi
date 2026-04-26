@@ -438,7 +438,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.4.7
+            v3.4.8
         </div>
         
         <div class="add-task">
@@ -586,10 +586,7 @@ async function renderTasks() {
         <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Completed</span>
         <span class="count-badge">${grouped.completed.length}</span>
     `;
-    // 点击勾选图标也能切换展开收起
-    completeHeader.addEventListener('click', () => {
-        completeHeader.classList.toggle('collapsed');
-    });
+    // 整个header点击都能切换展开收起
     completeHeader.addEventListener('click', () => {
         completeHeader.classList.toggle('collapsed');
     });
