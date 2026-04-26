@@ -211,6 +211,51 @@ def index():
 def vocab():
     return open('vocab.html', 'r', encoding='utf-8').read()
 
+# ====================
+# 页面标题存储（后端存储）
+# ====================
+@app.route('/api/page-title', methods=['GET'])
+def get_page_title():
+    conn = sqlite3.connect('tasks.db')
+    cursor = conn.cursor()
+    # 创建表如果不存在
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS page_config (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('SELECT value FROM page_config WHERE key = ?', ('page_title',))
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result:
+        return jsonify({'success': True, 'title': result[0]})
+    else:
+        return jsonify({'success': True, 'title': 'Tasks'})
+
+@app.route('/api/page-title', methods=['POST'])
+def save_page_title():
+    data = request.get_json()
+    title = data.get('title', 'Tasks')
+    
+    conn = sqlite3.connect('tasks.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS page_config (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+    # 插入或替换
+    cursor.execute('''
+        REPLACE INTO page_config (key, value) VALUES (?, ?)
+    ''', ('page_title', title))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
     # 启用HTTPS，使用自签名证书
     app.run(host='0.0.0.0', port=8080, debug=False, ssl_context=('cert.pem', 'key.pem'))

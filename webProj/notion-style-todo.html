@@ -236,7 +236,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.1.6 - 对接飞书语音识别 · 调整API路径 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.1.7 - 对接飞书语音识别 · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -756,19 +756,36 @@ document.getElementById('voiceInputBtn').addEventListener('click', startVoiceInp
 
 // ==================== 页面标题保存功能 ====================
 const pageTitleEl = document.getElementById('pageTitle');
+const API_BASE = window.location.origin;
 
 // 页面加载时读取保存的标题
-function loadPageTitle() {
-    const savedTitle = localStorage.getItem('todoPageTitle');
-    if (savedTitle) {
-        pageTitleEl.textContent = savedTitle;
+async function loadPageTitle() {
+    try {
+        const response = await fetch(`${API_BASE}/api/page-title`);
+        const data = await response.json();
+        if (data.success && data.title) {
+            pageTitleEl.textContent = data.title;
+        }
+    } catch (error) {
+        console.error('加载标题失败', error);
+        // 失败了用默认标题
     }
 }
 
-// 标题修改时自动保存
-pageTitleEl.addEventListener('input', () => {
+// 标题修改时自动保存到后端
+pageTitleEl.addEventListener('input', async () => {
     const currentTitle = pageTitleEl.textContent.trim();
-    localStorage.setItem('todoPageTitle', currentTitle);
+    try {
+        await fetch(`${API_BASE}/api/page-title`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: currentTitle })
+        });
+    } catch (error) {
+        console.error('保存标题失败', error);
+    }
 });
 
 // 加载标题
