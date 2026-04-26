@@ -105,9 +105,7 @@
 
         .task-list {
             background-color: #ffffff;
-            border-radius: 12px;
-            padding: 8px 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            padding: 4px 0;
         }
 
         .task-item {
@@ -317,50 +315,54 @@
             background-color: #289fc7;
         }
 
-        /* 优先级分组 */
+        /* 优先级分组 - Notion简约风格 */
         .priority-group {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            background-color: transparent;
+            margin-bottom: 16px;
+            border: 1px solid #e9e9e7;
+            border-radius: 4px;
+            overflow: hidden;
         }
 
         .priority-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 15px;
-            font-weight: 600;
-            padding: 8px 12px 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 14px;
+            background-color: #f7f6f3;
+            border-bottom: 1px solid #e9e9e7;
         }
 
         .high-priority-header {
-            background-color: #fff1f0;
-            color: #cf1322;
+            color: #eb5757;
         }
 
         .medium-priority-header {
-            background-color: #fffbe6;
-            color: #faad14;
+            color: #f2994a;
+        }
+
+        .date-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: #9b9a97;
+            padding: 10px 14px;
+            background-color: #f7f6f3;
+            border-bottom: 1px solid #e9e9e7;
         }
 
         .count-badge {
-            background-color: rgba(0, 0, 0, 0.08);
+            background-color: #ffffff;
+            border: 1px solid #e9e9e7;
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 12px;
             font-weight: 500;
-        }
-
-        .high-priority-header .count-badge {
-            background-color: rgba(207, 19, 34, 0.15);
-        }
-
-        .medium-priority-header .count-badge {
-            background-color: rgba(250, 173, 20, 0.15);
+            color: #37352f;
         }
 
         /* 已完成分组收缩 */
@@ -369,17 +371,12 @@
         }
 
         .date-group-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 15px;
-            font-weight: 600;
             color: #9b9a97;
-            margin-bottom: 0;
-            padding: 8px 12px;
             cursor: pointer;
-            border-radius: 8px;
-            background-color: #fafafa;
+        }
+
+        .date-group-header.completed-header {
+            color: #27ae60;
         }
 
         .date-group-header .toggle-icon {
@@ -588,7 +585,7 @@ async function renderTasks() {
     completeGroupEl.className = 'priority-group';
 
     const completeHeader = document.createElement('div');
-    completeHeader.className = 'date-group-header collapsed';
+    completeHeader.className = 'date-group-header collapsed completed-header';
     completeHeader.innerHTML = `
         <span>🟢 已完成 (${grouped.completed.length})</span>
         <span class="toggle-icon">▾</span>
