@@ -517,12 +517,6 @@ async function renderTasks() {
     const tasks = await getTasks();
     console.log('Tasks received:', tasks);
 
-    if (tasks.length === 0) {
-        taskListEl.innerHTML = '';
-        emptyStateEl.style.display = 'block';
-        return;
-    }
-
     // 分组：高优先级未完成 / 中等优先级未完成 / 已完成
     const grouped = {
         high: [],
