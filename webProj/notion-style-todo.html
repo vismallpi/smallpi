@@ -206,6 +206,77 @@
             color: #ff4d4f;
         }
 
+        /* 自定义确认对话框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #eb5424;
+            margin-bottom: 12px;
+        }
+
+        .modal-task-name {
+            font-size: 15px;
+            color: #37352f;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn-cancel {
+            background-color: #f5f5f5;
+            color: #37352f;
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: #e8e8e8;
+        }
+
+        .modal-btn-confirm {
+            background-color: #2eaadc;
+            color: #ffffff;
+        }
+
+        .modal-btn-confirm:hover {
+            background-color: #289fc7;
+        }
+
         .empty-state {
             text-align: center;
             color: #9b9a97;
@@ -236,7 +307,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.1.12 - 对接飞书语音识别 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.1.13 - 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -412,15 +483,44 @@ async function toggleTaskComplete(id) {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     
-    // 二次确认
-    if (!confirm(`确认切换 "${task.text}" 状态？`)) {
-        // 用户取消，刷新checkbox保持原状态
-        await renderTasks();
-        return;
-    }
+    // 创建自定义确认模态框
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-title">切换任务状态</div>
+            <div class="modal-task-name">${escapeHtml(task.text)}</div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="modal-cancel">取消</button>
+                <button class="modal-btn modal-btn-confirm" id="modal-confirm">确认</button>
+            </div>
+        </div>
+    `;
     
-    await toggleTaskCompleteInDB(id);
-    await renderTasks();
+    document.body.appendChild(overlay);
+    
+    // 绑定按钮事件
+    return new Promise(resolve => {
+        document.getElementById('modal-cancel').addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            renderTasks();
+            resolve(false);
+        });
+        
+        document.getElementById('modal-confirm').addEventListener('click', async () => {
+            document.body.removeChild(overlay);
+            await toggleTaskCompleteInDB(id);
+            await renderTasks();
+            resolve(true);
+        });
+    });
+}
+
+// HTML转义，防止XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // 删除任务
