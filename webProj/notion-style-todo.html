@@ -356,6 +356,7 @@
             padding: 12px 16px;
             background-color: #f7f6f3;
             border-bottom: 1px solid #f0f0ee;
+            cursor: pointer;
         }
 
         .count-badge {
@@ -373,23 +374,14 @@
             margin-bottom: 0;
         }
 
-        .date-group-header {
-            color: #9b9a97;
-            cursor: pointer;
+        .date-group-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
 
-        .date-group-header.completed-header {
-            color: #27ae60;
-        }
-
-        .date-group-header .toggle-icon {
-            font-size: 18px;
-            transition: transform 0.2s;
-            margin-right: 12px;
-        }
-
-        .date-group-header.collapsed .toggle-icon {
-            transform: rotate(-90deg);
+        .date-group-header.collapsed + .date-group-content {
+            max-height: 0;
+            opacity: 0;
         }
 
         .date-group-content {
@@ -446,7 +438,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.4.6
+            v3.4.7
         </div>
         
         <div class="add-task">
