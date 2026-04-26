@@ -438,12 +438,12 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.4.8
+            v3.5.0
         </div>
         
         <div class="add-task">
             <input type="text" id="newTaskInput" placeholder="添加新任务...">
-            <button id="addTaskBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 添加</button>
+            <button id="addTaskBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20c5-3 8-3 10-7 2-4 5-7 8-10z"/><path d="M14 2c1 2 2 5 3 8-5 0-6-3-10-3z"/></svg> Add</button>
             <button id="voiceInputBtn" style="background-color: #f7f6f3; color: #37352f; border: 1px solid #e9e9e7;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></button>
         </div>
 
@@ -539,7 +539,7 @@ async function renderTasks() {
     const highHeader = document.createElement('div');
     highHeader.className = 'priority-header high-priority-header';
     highHeader.innerHTML = `
-        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg> High Priority</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12c2-4 4-6 7-6 5 0 6 2 8 5 6z"/><path d="M15 8c2 0 4 1 5 3 1 2-1 3-2 3-1"/><circle cx="18" cy="8" r="1"/></svg> High Priority</span>
         <span class="count-badge">${grouped.high.length}</span>
     `;
 
@@ -561,7 +561,7 @@ async function renderTasks() {
     const mediumHeader = document.createElement('div');
     mediumHeader.className = 'priority-header medium-priority-header';
     mediumHeader.innerHTML = `
-        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg> Medium Priority</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M8 15c2 3 6 3 8 0"/></svg> Medium Priority</span>
         <span class="count-badge">${grouped.medium.length}</span>
     `;
 
@@ -583,7 +583,7 @@ async function renderTasks() {
     const completeHeader = document.createElement('div');
     completeHeader.className = 'date-group-header collapsed completed-header';
     completeHeader.innerHTML = `
-        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Completed</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="13" rx="8" ry="6"/><circle cx="7" cy="10" r="1"/><circle cx="17" cy="10" r="1"/><path d="M8 18c1 2 8 2 8 0"/></svg> Completed</span>
         <span class="count-badge">${grouped.completed.length}</span>
     `;
     // 整个header点击都能切换展开收起

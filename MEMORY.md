@@ -26,8 +26,8 @@ This file stores important decisions, lessons learned, and key information that 
 - 问题修复记录：
   - v3.1.9 修复了 `API_BASE` 变量重复定义冲突，导致API调用失败不显示任务列表bug
 
-**最新版本：v3.4.8**
-最新改动：移除重复click事件绑定，修复Completed section点击展开失效
+**最新版本：v3.5.0**
+最新改动：全部使用猫咪主题简约线性图标，可爱简约风格统一
 
 **开发规则（强制遵守）：**
 1. ✅ 每次改动代码，必须更新前端版本号（notion-style-todo.html 中显示）
