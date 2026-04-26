@@ -257,5 +257,10 @@ def save_page_title():
     return jsonify({'success': True})
 
 if __name__ == '__main__':
+    # 同时启用 HTTP (8081) 和 HTTPS (8080)
+    import threading
+    def run_http():
+        app.run(host='0.0.0.0', port=8081, debug=False)
+    threading.Thread(target=run_http, daemon=True).start()
     # 启用HTTPS，使用自签名证书
     app.run(host='0.0.0.0', port=8080, debug=False, ssl_context=('cert.pem', 'key.pem'))

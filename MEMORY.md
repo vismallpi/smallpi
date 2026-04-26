@@ -18,9 +18,10 @@ This file stores important decisions, lessons learned, and key information that 
   - 当前企业版本无法开通 `ai.asr.speech_recognize` 权限
   - 代码已就绪，企业升级到旗舰版后即可直接使用
 
-- 待办网站服务保持 7*24 在线运行在 `0.0.0.0:8080`
+- 待办网站服务保持 7*24 在线运行
+  - HTTPS：`0.0.0.0:8080` → `https://101.96.196.120:8080/`
+  - HTTP：`0.0.0.0:8081` → `http://101.96.196.120:8081/`
 - 服务器公网IP：`101.96.196.120`
-- 访问地址：`https://101.96.196.120:8080/`
 
 **开发规则（强制遵守）：**
 1. ✅ 每次改动代码，必须更新前端版本号（notion-style-todo.html 中显示）
