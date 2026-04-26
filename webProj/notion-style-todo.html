@@ -317,21 +317,69 @@
             background-color: #289fc7;
         }
 
-        /* 已完成任务分组收缩 */
+        /* 优先级分组 */
+        .priority-group {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .priority-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 8px 12px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .high-priority-header {
+            background-color: #fff1f0;
+            color: #cf1322;
+        }
+
+        .medium-priority-header {
+            background-color: #fffbe6;
+            color: #faad14;
+        }
+
+        .count-badge {
+            background-color: rgba(0, 0, 0, 0.08);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .high-priority-header .count-badge {
+            background-color: rgba(207, 19, 34, 0.15);
+        }
+
+        .medium-priority-header .count-badge {
+            background-color: rgba(250, 173, 20, 0.15);
+        }
+
+        /* 已完成分组收缩 */
         .date-group {
-            margin-bottom: 24px;
+            margin-bottom: 0;
         }
 
         .date-group-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: #9b9a97;
-            margin-bottom: 8px;
-            padding: 8px 0;
+            margin-bottom: 0;
+            padding: 8px 12px;
             cursor: pointer;
+            border-radius: 8px;
+            background-color: #fafafa;
         }
 
         .date-group-header .toggle-icon {
@@ -397,7 +445,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.2.1 - 已完成任务默认收缩 · 弹窗文字居中 · 移动端整体样式美化 · 自定义底部弹窗确认 · 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.3.0 - 优先级分组 · 已完成整体收缩 · 弹窗文字居中 · 移动端整体样式美化 · 自定义底部弹窗确认 · 对接飞书语音识别 · 自定义美化确认模态框 · 简化确认框文字 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -475,86 +523,102 @@ async function renderTasks() {
         return;
     }
 
-    // 按日期分组（创建日期 YYYY-MM-DD）
-    const tasksByDate = {};
+    // 分组：高优先级未完成 / 中等优先级未完成 / 已完成
+    const grouped = {
+        high: [],
+        medium: [],
+        completed: []
+    };
+
     tasks.forEach(task => {
-        // task.id 是毫秒时间戳，转换为日期
-        const date = new Date(parseInt(task.id));
-        const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
-        if (!tasksByDate[dateStr]) {
-            tasksByDate[dateStr] = {
-                incomplete: [],
-                complete: []
-            };
-        }
+        // 默认所有新任务都放中等优先级，用户自己拖拽调整
+        // 通过位置判断优先级：在high分组就是高，在medium就是中
         if (task.completed) {
-            tasksByDate[dateStr].complete.push(task);
+            grouped.completed.push(task);
+        } else if (task.priority === 'high') {
+            grouped.high.push(task);
         } else {
-            tasksByDate[dateStr].incomplete.push(task);
+            grouped.medium.push(task);
         }
     });
 
     emptyStateEl.style.display = 'none';
-    taskListEl.innerHTML = '';
+    taskList.innerHTML = '';
 
-    // 按日期从新到旧排序
-    const sortedDates = Object.keys(tasksByDate).sort().reverse();
+    // 高优先级未完成（一直展开）
+    if (grouped.high.length > 0) {
+        const priorityGroupEl = document.createElement('div');
+        priorityGroupEl.className = 'priority-group';
 
-    sortedDates.forEach(dateStr => {
-        const group = tasksByDate[dateStr];
-        const dateGroupEl = document.createElement('div');
-        dateGroupEl.className = 'date-group';
+        const header = document.createElement('div');
+        header.className = 'priority-header high-priority-header';
+        header.innerHTML = `
+            <span>🔴 高优先级</span>
+            <span class="count-badge">${grouped.high.length}</span>
+        `;
 
-        // 只显示日期，格式化更友好
-        const displayDate = new Date(dateStr).toLocaleDateString('zh-CN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'long'
+        const taskListContainer = document.createElement('div');
+        taskListContainer.className = 'task-list';
+        grouped.high.forEach(task => {
+            const taskEl = createTaskElement(task);
+            taskListContainer.appendChild(taskEl);
         });
 
-        // 日期分组头部
-        const dateHeaderHtml = `
-            <div class="date-header">${displayDate}</div>
+        priorityGroupEl.appendChild(header);
+        priorityGroupEl.appendChild(taskListContainer);
+        taskListEl.appendChild(priorityGroupEl);
+    }
+
+    // 中等优先级未完成（一直展开，默认所有新任务都放这里）
+    if (grouped.medium.length > 0) {
+        const priorityGroupEl = document.createElement('div');
+        priorityGroupEl.className = 'priority-group';
+
+        const header = document.createElement('div');
+        header.className = 'priority-header medium-priority-header';
+        header.innerHTML = `
+            <span>🟡 中等优先级</span>
+            <span class="count-badge">${grouped.medium.length}</span>
         `;
-        dateGroupEl.innerHTML = dateHeaderHtml;
 
-        // 未完成任务列表（一直展开）
-        if (group.incomplete.length > 0) {
-            const incompleteList = document.createElement('div');
-            incompleteList.className = 'task-list';
-            group.incomplete.forEach(task => {
-                const taskEl = createTaskElement(task);
-                incompleteList.appendChild(taskEl);
-            });
-            dateGroupEl.appendChild(incompleteList);
-        }
+        const taskListContainer = document.createElement('div');
+        taskListContainer.className = 'task-list';
+        grouped.medium.forEach(task => {
+            const taskEl = createTaskElement(task);
+            taskListContainer.appendChild(taskEl);
+        });
 
-        // 已完成任务列表（默认收缩）
-        if (group.complete.length > 0) {
-            const completeHeader = document.createElement('div');
-            completeHeader.className = 'date-group-header collapsed';
-            completeHeader.innerHTML = `
-                <span>已完成 (${group.complete.length})</span>
-                <span class="toggle-icon">▾</span>
-            `;
-            completeHeader.addEventListener('click', () => {
-                completeHeader.classList.toggle('collapsed');
-            });
+        priorityGroupEl.appendChild(header);
+        priorityGroupEl.appendChild(taskListContainer);
+        taskListEl.appendChild(priorityGroupEl);
+    }
 
-            const completeList = document.createElement('div');
-            completeList.className = 'date-group-content task-list';
-            group.complete.forEach(task => {
-                const taskEl = createTaskElement(task);
-                completeList.appendChild(taskEl);
-            });
+    // 所有已完成（默认收缩）
+    if (grouped.completed.length > 0) {
+        const completeGroupEl = document.createElement('div');
+        completeGroupEl.className = 'priority-group';
 
-            dateGroupEl.appendChild(completeHeader);
-            dateGroupEl.appendChild(completeList);
-        }
+        const completeHeader = document.createElement('div');
+        completeHeader.className = 'date-group-header collapsed';
+        completeHeader.innerHTML = `
+            <span>✅ 已完成 (${grouped.completed.length})</span>
+            <span class="toggle-icon">▾</span>
+        `;
+        completeHeader.addEventListener('click', () => {
+            completeHeader.classList.toggle('collapsed');
+        });
 
-        taskListEl.appendChild(dateGroupEl);
-    });
+        const completeList = document.createElement('div');
+        completeList.className = 'date-group-content task-list';
+        grouped.completed.forEach(task => {
+            const taskEl = createTaskElement(task);
+            completeList.appendChild(taskEl);
+        });
+
+        completeGroupEl.appendChild(completeHeader);
+        completeGroupEl.appendChild(completeList);
+        taskListEl.appendChild(completeGroupEl);
+    }
 
     console.log('Render complete');
 }

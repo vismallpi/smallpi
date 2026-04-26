@@ -17,6 +17,7 @@ def init_db():
             id TEXT PRIMARY KEY,
             text TEXT NOT NULL,
             completed INTEGER DEFAULT 0,
+            priority TEXT DEFAULT 'medium',
             date TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -24,6 +25,11 @@ def init_db():
     # 尝试添加 created_at 列，如果已经存在会报错，忽略
     try:
         cursor.execute('ALTER TABLE tasks ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+    except:
+        pass
+    # 尝试添加 priority 列，如果已经存在会报错，忽略
+    try:
+        cursor.execute("ALTER TABLE tasks ADD COLUMN priority TEXT DEFAULT 'medium'")
     except:
         pass
     conn.commit()
@@ -36,7 +42,7 @@ init_db()
 def get_tasks():
     conn = sqlite3.connect('tasks.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT id, text, completed, date, created_at FROM tasks ORDER BY created_at DESC')
+    cursor.execute('SELECT id, text, completed, priority, date, created_at FROM tasks ORDER BY created_at DESC')
     tasks = cursor.fetchall()
     conn.close()
     
@@ -46,8 +52,9 @@ def get_tasks():
             'id': task[0],
             'text': task[1],
             'completed': bool(task[2]),
-            'date': task[3],
-            'created_at': task[4]
+            'priority': task[3] || 'medium',
+            'date': task[4],
+            'created_at': task[5]
         })
     return jsonify(result)
 
@@ -60,6 +67,7 @@ def add_task():
         'id': str(int(now.timestamp() * 1000)),
         'text': data['text'],
         'completed': False,
+        'priority': 'medium',
         'date': now.isoformat().split('T')[0],
         'created_at': now.strftime('%Y-%m-%d %H:%M:%S')
     }
@@ -67,8 +75,8 @@ def add_task():
     conn = sqlite3.connect('tasks.db')
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO tasks (id, text, completed, date, created_at) VALUES (?, ?, ?, ?, ?)',
-        (task['id'], task['text'], int(task['completed']), task['date'], task['created_at'])
+        'INSERT INTO tasks (id, text, completed, priority, date, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+        (task['id'], task['text'], int(task['completed']), task['priority'], task['date'], task['created_at'])
     )
     conn.commit()
     conn.close()
