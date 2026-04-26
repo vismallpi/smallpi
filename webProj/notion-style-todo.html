@@ -353,6 +353,10 @@
             background-color: #5871A9;
         }
 
+        .completed-group {
+            background-color: #5871A9;
+        }
+
         .date-group-header {
             display: flex;
             justify-content: space-between;
@@ -380,6 +384,10 @@
             background-color: #ffffff;
             border: 1px solid #ffffff;
             color: #5871A9;
+        }
+
+        .completed-group .task-item {
+            background-color: #ffffff;
         }
 
         /* 已完成分组收缩 */
@@ -451,7 +459,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.5.7
+            v3.5.8
         </div>
         
         <div class="add-task">
@@ -591,7 +599,7 @@ async function renderTasks() {
 
     // 所有已完成（默认收缩，空分组也显示）
     const completeGroupEl = document.createElement('div');
-    completeGroupEl.className = 'priority-group';
+    completeGroupEl.className = 'priority-group completed-group';
 
     const completeHeader = document.createElement('div');
     completeHeader.className = 'date-group-header collapsed completed-header';
