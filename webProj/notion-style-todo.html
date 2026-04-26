@@ -443,10 +443,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
-        <div class="version-info">
-            v3.3.3<br>2026-04-26
-        </div>
+        <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks <span style="font-size: 12px; color: #9b9a97; font-weight: normal;">v3.3.3</span></h1>
         
         <div class="add-task">
             <input type="text" id="newTaskInput" placeholder="添加新任务...">
@@ -590,7 +587,7 @@ async function renderTasks() {
     const completeHeader = document.createElement('div');
     completeHeader.className = 'date-group-header collapsed';
     completeHeader.innerHTML = `
-        <span>✅ 已完成 (${grouped.completed.length})</span>
+        <span>🟢 已完成 (${grouped.completed.length})</span>
         <span class="toggle-icon">▾</span>
     `;
     completeHeader.addEventListener('click', () => {
@@ -879,6 +876,8 @@ function enableDragSort() {
 
         // 拖拽结束后，更新所有任务的优先级（根据它们现在所在的分组）
         await updateAllPriorities();
+        // 更新完成后重新渲染，刷新分组计数
+        await renderTasks();
     });
 
     // 更新所有任务优先级 - 根据DOM位置重新保存优先级
@@ -976,6 +975,8 @@ function enableDragSort() {
 
         // 拖拽结束后更新所有优先级
         await updateAllPriorities();
+        // 更新完成后重新渲染，刷新分组计数
+        await renderTasks();
     });
 }
 
