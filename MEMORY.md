@@ -23,6 +23,9 @@ This file stores important decisions, lessons learned, and key information that 
   - HTTP：`0.0.0.0:8081` → `http://101.96.196.120:8081/`
 - 服务器公网IP：`101.96.196.120`
 
+- 问题修复记录：
+  - v3.1.9 修复了 `API_BASE` 变量重复定义冲突，导致API调用失败不显示任务列表bug
+
 **开发规则（强制遵守）：**
 1. ✅ 每次改动代码，必须更新前端版本号（notion-style-todo.html 中显示）
 2. ✅ 每次代码改动，必须先做测试，确认测试成功后再发布给用户

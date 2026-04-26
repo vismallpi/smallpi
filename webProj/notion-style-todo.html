@@ -236,7 +236,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.1.8 - 对接飞书语音识别 · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.1.9 - 对接飞书语音识别 · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -756,7 +756,6 @@ document.getElementById('voiceInputBtn').addEventListener('click', startVoiceInp
 
 // ==================== 页面标题保存功能 ====================
 const pageTitleEl = document.getElementById('pageTitle');
-const API_BASE = window.location.origin;
 
 // 页面加载时读取保存的标题
 async function loadPageTitle() {
