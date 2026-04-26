@@ -546,7 +546,7 @@ async function renderTasks() {
     const highHeader = document.createElement('div');
     highHeader.className = 'priority-header high-priority-header';
     highHeader.innerHTML = `
-        <span>🔴 高优先级</span>
+        <span>High Priority</span>
         <span class="count-badge">${grouped.high.length}</span>
     `;
 
@@ -568,7 +568,7 @@ async function renderTasks() {
     const mediumHeader = document.createElement('div');
     mediumHeader.className = 'priority-header medium-priority-header';
     mediumHeader.innerHTML = `
-        <span>🟡 中等优先级</span>
+        <span>Medium Priority</span>
         <span class="count-badge">${grouped.medium.length}</span>
     `;
 
@@ -590,7 +590,7 @@ async function renderTasks() {
     const completeHeader = document.createElement('div');
     completeHeader.className = 'date-group-header collapsed completed-header';
     completeHeader.innerHTML = `
-        <span>🟢 已完成 (${grouped.completed.length})</span>
+        <span>Completed (${grouped.completed.length})</span>
         <span class="toggle-icon">▾</span>
     `;
     completeHeader.addEventListener('click', () => {

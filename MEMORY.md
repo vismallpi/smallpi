@@ -26,8 +26,8 @@ This file stores important decisions, lessons learned, and key information that 
 - 问题修复记录：
   - v3.1.9 修复了 `API_BASE` 变量重复定义冲突，导致API调用失败不显示任务列表bug
 
-**最新版本：v3.3.9**
-最新改动：全网站统一极简黑白灰配色，去掉所有彩色，专业干净
+**最新版本：v3.4.0**
+最新改动：简约线性风格，去掉彩色emoji，用文字标识分组，全黑白灰极简专业设计
 
 **开发规则（强制遵守）：**
 1. ✅ 每次改动代码，必须更新前端版本号（notion-style-todo.html 中显示）
