@@ -236,7 +236,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.1.10 - 对接飞书语音识别 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
+            v3.1.11 - 对接飞书语音识别 · 添加checkbox二次确认 · 修复标题保存路径bug · 修复API_BASE变量冲突bug · 同时支持HTTP(8081)/HTTPS(8080) · 标题后端存储 · 支持PC+手机拖拽 · 语音输入 · 标题可编辑 · 2026-04-26
         </div>
         
         <div class="add-task">
@@ -407,6 +407,21 @@ async function addTask() {
 
 // 切换任务完成状态
 async function toggleTaskComplete(id) {
+    // 先获取当前任务状态
+    const tasks = await getTasks();
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    
+    const newStatus = !task.completed;
+    const actionText = newStatus ? '标记为已经完成' : '标记为未完成';
+    
+    // 二次确认
+    if (!confirm(`确认把 " ${task.text} " 任务${actionText}？`)) {
+        // 用户取消，刷新checkbox保持原状态
+        await renderTasks();
+        return;
+    }
+    
     await toggleTaskCompleteInDB(id);
     await renderTasks();
 }
