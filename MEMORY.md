@@ -26,8 +26,8 @@ This file stores important decisions, lessons learned, and key information that 
 - 问题修复记录：
   - v3.1.9 修复了 `API_BASE` 变量重复定义冲突，导致API调用失败不显示任务列表bug
 
-**最新版本：v3.6.2**
-最新改动：语音按钮恢复原来浅灰色背景，带边框，和原来一致
+**最新版本：v3.6.3**
+最新改动：title和版本号居中，task字体缩小一号，弹窗按钮居中，确认按钮背景色和add一致
 
 **开发规则（强制遵守）：**
 1. ✅ 每次改动代码，必须更新前端版本号（notion-style-todo.html 中显示）
