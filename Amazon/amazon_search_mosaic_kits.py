@@ -5,7 +5,7 @@ Steps:
 1. Open Amazon homepage
 2. Search for "mosaic kits for adults"
 3. Find specific ASINs (B0DDDWWJBC, B0CWZ2Z5TS), keep flipping pages if not found on first page
-4. Click into product page and take screenshot
+4. Click into product page directly from search results and take screenshot
 """
 
 import time
@@ -58,12 +58,12 @@ def main():
         driver.quit()
         return
     
-    found_asins = []
+    found_links = []  # Store (asin, link_element)
     page_number = 1
     
     # Step 3: Find target ASINs, keep flipping pages if needed
     print("[Step 3] Looking for target ASINs...")
-    while len(found_asins) < len(TARGET_ASINS):
+    while len(found_links) < len(TARGET_ASINS):
         print(f"  Checking page {page_number}...")
         
         # Get all product links on current page
@@ -74,11 +74,14 @@ def main():
             if href:
                 # Check if href contains any of our target ASINs
                 for asin in TARGET_ASINS:
-                    if asin in href and asin not in found_asins:
-                        print(f"  ✅ Found ASIN: {asin} on page {page_number}")
-                        found_asins.append(asin)
+                    if asin in href:
+                        # Check if already found
+                        already_found = any(f[0] == asin for f in found_links)
+                        if not already_found:
+                            print(f"  ✅ Found ASIN: {asin} on page {page_number}")
+                            found_links.append((asin, link))
         
-        if len(found_asins) == len(TARGET_ASINS):
+        if len(found_links) == len(TARGET_ASINS):
             break
         
         # Check if there's a next page
@@ -94,23 +97,30 @@ def main():
             print(f"  ❌ Cannot find next page button: {e}")
             break
     
-    print(f"\n  Found {len(found_asins)}/{len(TARGET_ASINS)} target ASINs")
+    print(f"\n  Found {len(found_links)}/{len(TARGET_ASINS)} target ASINs")
     
-    # Step 4: Click into product page and take screenshot
+    # Step 4: Click into product page directly from search results and take screenshot
     print("\n[Step 4] Taking screenshots for found ASINs...")
-    for asin in found_asins:
-        product_url = f"https://www.amazon.com/dp/{asin}"
-        print(f"  Opening {asin}...")
-        driver.get(product_url)
-        time.sleep(5)
+    for (asin, link) in found_links:
+        print(f"  Clicking into {asin} from search results...")
+        # Scroll the link into view
+        driver.execute_script("arguments[0].scrollIntoView(true);", link)
+        time.sleep(1)
+        # Click the link directly
+        link.click()
+        time.sleep(5)  # Wait for page to load
         
         # Take full page screenshot
         screenshot_path = os.path.join(SCREENSHOT_DIR, f"{asin}_screenshot.png")
         driver.save_screenshot(screenshot_path)
         print(f"  ✅ Screenshot saved: {screenshot_path}")
+        
+        # Go back to search results page for next product
+        driver.back()
+        time.sleep(3)
     
     print("\n=== Automation completed ===")
-    print(f"Total found: {len(found_asins)}/{len(TARGET_ASINS)}")
+    print(f"Total found: {len(found_links)}/{len(TARGET_ASINS)}")
     print(f"Screenshots saved to: {SCREENSHOT_DIR}")
     
     driver.quit()
