@@ -45,16 +45,12 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
   - B0DDDWWJBC: #Arts, Crafts & Sewing, #Mosaic Tiles
   - B0CWZ2Z5TS: #Arts, Crafts & Sewing, #Mosaic Tiles
 - **Post targets:**
-  1. Personal chat: 魏总 (ou_a331505193726d421fb0108a11bc6197)
+  1. Personal chat: 魏总
   2. Group chat: oc_f062f1419920a10e7da7202de0bec986
 - **Bitable update target:**
-  - App token: I2VNbkpkTaUDISsACs5ctFDgnte
-  - Table ID: tblUhqzVlCHz309V
-  - Full URL: https://fqjt33o3gr7.feishu.cn/base/I2VNbkpkTaUDISsACs5ctFDgnte?table=tblUhqzVlCHz309V&view=vewDZ1kv62
+  - Full URL: https://fqjt33o3gr7.feishu.cn/base/...
 - **Feishu Bitable for ranking history:**
-  - URL: https://fqjt33o3gr7.feishu.cn/base/I2VNbkpkTaUDISsACs5ctFDgnte?table=tblUhqzVlCHz309V&view=vewDZ1kv62
-  - app_token: I2VNbkpkTaUDISsACs5ctFDgnte
-  - table_id: tblUhqzVlCHz309V
+  - URL: https://fqjt33o3gr7.feishu.cn/base/...
   - **Date rule:** 查询时刻使用当日0点秒级时间戳（YYYY/MM/DD 00:00 GMT+8）
 
 Add whatever helps you do your job. This is your cheat sheet.
