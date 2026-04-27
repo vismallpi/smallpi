@@ -365,9 +365,9 @@
             background-color: #FCD4DF;
         }
 
-        .medium-priority-header {
+        .date-group-header.medium-priority-header {
             color: #37352f;
-            background-color: #C5E5EF;
+            background-color: #C5E5EF !important;
         }
 
         .date-group-header.longterm-priority-header {
@@ -478,7 +478,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.7.3
+            v3.8.0
         </div>
         
         <div class="add-task">
@@ -597,19 +597,23 @@ async function renderTasks() {
     highGroupEl.appendChild(highListContainer);
     taskListEl.appendChild(highGroupEl);
 
-    // 中等优先级未完成（一直展开，空分组也显示，默认所有新任务都放这里）
+    // 中等优先级未完成（支持收缩展开，默认展开，默认所有新任务都放这里）
     const mediumGroupEl = document.createElement('div');
     mediumGroupEl.className = 'priority-group';
 
     const mediumHeader = document.createElement('div');
-    mediumHeader.className = 'priority-header medium-priority-header';
+    mediumHeader.className = 'date-group-header medium-priority-header';
     mediumHeader.innerHTML = `
         <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><circle cx="12" cy="12" r="10"/></svg> Medium Priority</span>
         <span class="count-badge">${grouped.medium.length}</span>
     `;
+    // 整个header点击都能切换展开收起，默认展开
+    mediumHeader.addEventListener('click', () => {
+        mediumHeader.classList.toggle('collapsed');
+    });
 
     const mediumListContainer = document.createElement('div');
-    mediumListContainer.className = 'task-list';
+    mediumListContainer.className = 'date-group-content task-list';
     grouped.medium.forEach(task => {
         const taskEl = createTaskElement(task);
         mediumListContainer.appendChild(taskEl);
