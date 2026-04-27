@@ -478,7 +478,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.7.0
+            v3.7.1
         </div>
         
         <div class="add-task">
@@ -619,19 +619,23 @@ async function renderTasks() {
     mediumGroupEl.appendChild(mediumListContainer);
     taskListEl.appendChild(mediumGroupEl);
 
-    // 长期任务（一直展开，空分组也显示）
+    // 长期任务（默认收缩）
     const longtermGroupEl = document.createElement('div');
     longtermGroupEl.className = 'priority-group';
 
     const longtermHeader = document.createElement('div');
-    longtermHeader.className = 'priority-header longterm-priority-header';
+    longtermHeader.className = 'date-group-header collapsed longterm-priority-header';
     longtermHeader.innerHTML = `
         <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Long Term</span>
         <span class="count-badge">${grouped.longterm.length}</span>
     `;
+    // 整个header点击都能切换展开收起
+    longtermHeader.addEventListener('click', () => {
+        longtermHeader.classList.toggle('collapsed');
+    });
 
     const longtermListContainer = document.createElement('div');
-    longtermListContainer.className = 'task-list';
+    longtermListContainer.className = 'date-group-content task-list';
     grouped.longterm.forEach(task => {
         const taskEl = createTaskElement(task);
         longtermListContainer.appendChild(taskEl);
