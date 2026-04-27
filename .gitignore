@@ -1,0 +1,5 @@
+# Local configuration with sensitive info
+TOOLS.md
+MEMORY.md
+*.log
+*.db
