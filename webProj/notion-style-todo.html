@@ -370,6 +370,11 @@
             background-color: #C5E5EF;
         }
 
+        .longterm-priority-header {
+            color: #37352f;
+            background-color: #D8E8CB;
+        }
+
         .completed-header {
             color: #37352f;
             background-color: #A9C5ED;
@@ -473,7 +478,7 @@
     <div class="container">
         <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
         <div class="version-info">
-            v3.6.3
+            v3.7.0
         </div>
         
         <div class="add-task">
@@ -545,20 +550,23 @@ async function renderTasks() {
     const tasks = await getTasks();
     console.log('Tasks received:', tasks);
 
-    // 分组：高优先级未完成 / 中等优先级未完成 / 已完成
+    // 分组：高优先级未完成 / 中等优先级未完成 / 长期任务 / 已完成
     const grouped = {
         high: [],
         medium: [],
+        longterm: [],
         completed: []
     };
 
     tasks.forEach(task => {
         // 默认所有新任务都放中等优先级，用户自己拖拽调整
-        // 通过位置判断优先级：在high分组就是高，在medium就是中
+        // 通过位置判断优先级：在high分组就是高，在medium就是中，在longterm就是长期
         if (task.completed) {
             grouped.completed.push(task);
         } else if (task.priority === 'high') {
             grouped.high.push(task);
+        } else if (task.priority === 'longterm') {
+            grouped.longterm.push(task);
         } else {
             grouped.medium.push(task);
         }
@@ -610,6 +618,28 @@ async function renderTasks() {
     mediumGroupEl.appendChild(mediumHeader);
     mediumGroupEl.appendChild(mediumListContainer);
     taskListEl.appendChild(mediumGroupEl);
+
+    // 长期任务（一直展开，空分组也显示）
+    const longtermGroupEl = document.createElement('div');
+    longtermGroupEl.className = 'priority-group';
+
+    const longtermHeader = document.createElement('div');
+    longtermHeader.className = 'priority-header longterm-priority-header';
+    longtermHeader.innerHTML = `
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Long Term</span>
+        <span class="count-badge">${grouped.longterm.length}</span>
+    `;
+
+    const longtermListContainer = document.createElement('div');
+    longtermListContainer.className = 'task-list';
+    grouped.longterm.forEach(task => {
+        const taskEl = createTaskElement(task);
+        longtermListContainer.appendChild(taskEl);
+    });
+
+    longtermGroupEl.appendChild(longtermHeader);
+    longtermGroupEl.appendChild(longtermListContainer);
+    taskListEl.appendChild(longtermGroupEl);
 
     // 所有已完成（默认收缩，空分组也显示）
     const completeGroupEl = document.createElement('div');
@@ -923,10 +953,11 @@ function enableDragSort() {
                 tasks.push(taskId);
             });
 
-            // 判断分组：0 = high, 1 = medium, 2 = completed
+            // 判断分组：0 = high, 1 = medium, 2 = longterm, 3 = completed
             let priority;
             if (groupIndex === 0) priority = 'high';
             else if (groupIndex === 1) priority = 'medium';
+            else if (groupIndex === 2) priority = 'longterm';
             else priority = 'completed';
 
             for (const taskId of tasks) {
