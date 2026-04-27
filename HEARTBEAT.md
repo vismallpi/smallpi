@@ -51,3 +51,10 @@
   3. git commit -a -m "Auto backup: $(date +'%Y-%m-%d %H:%M') workspace backup"
   4. git push -f origin master
   5. 推送完成后发送通知确认
+
+## Daily automatic task: Send MEMORY.md to user
+- Frequency: every day at 11:30 PM GMT+8
+- Tasks:
+  1. Read /root/.openclaw/workspace/MEMORY.md
+  2. Send the full content of MEMORY.md to 魏总 (ou_a331505193726d421fb0108a11bc6197)
+  3. Send as plain text message
