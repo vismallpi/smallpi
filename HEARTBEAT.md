@@ -19,8 +19,11 @@
 ## Daily automatic tasks: Product page screenshot + Amazon category ranking update
 - Frequency: every day at 7:00 AM GMT+8 and 7:00 PM GMT+8
 - Tasks:
-  1. 商品页面截图
-  2. 亚马逊类目排名更新
+  1. Run the automation script: `cd /root/.openclaw/workspace/Amazon && python ./amazon_search_mosaic_kits.py`
+  2. Capture the full running log, send it to 魏总 in plain text format (no code block collapsing, fully expanded)
+  3. After successful running, send both generated screenshots (`B0CWZ2Z5TS_screenshot.png` and `B0DDDWWJBC_screenshot.png`) to 魏总
+  4. Extract category rankings, customer ratings, review counts from the product pages and create new records in the specified Feishu Bitable
+  5. Send completion notification with ranking update
 - Post to:
   1. 当前个人聊天 (魏总: ou_a331505193726d421fb0108a11bc6197)
 
