@@ -16,6 +16,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 
 # Configuration
 TARGET_ASINS = ["B0DDDWWJBC", "B0CWZ2Z5TS"]
@@ -30,13 +32,15 @@ chrome_options.add_argument("--headless")  # Run in headless mode
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920,1080")
+chrome_options.add_argument("--disable-gpu")
 
 def main():
     print("=== Starting Amazon Automation ===\n")
     
     # Step 1: Open Amazon homepage
     print("[Step 1] Opening Amazon homepage...")
-    driver = webdriver.Chrome(options=chrome_options)
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get(AMAZON_URL)
     time.sleep(3)
     print("✅ Amazon homepage opened\n")
@@ -49,7 +53,7 @@ def main():
             EC.presence_of_element_located((By.ID, "twotabsearchtextbox"))
         )
         search_box.clear()
-        search_box.send_keys(SEARCH_KEY)
+        search_box.send_keys(SEARCH_KEYWORD)
         search_box.send_keys(Keys.RETURN)
         time.sleep(5)
         print("✅ Search completed\n")
