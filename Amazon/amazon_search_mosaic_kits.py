@@ -49,7 +49,7 @@ def main():
             EC.presence_of_element_located((By.ID, "twotabsearchtextbox"))
         )
         search_box.clear()
-        search_box.send_keys(SEARCH_KEYWORD)
+        search_box.send_keys(SEARCH_KEY)
         search_box.send_keys(Keys.RETURN)
         time.sleep(5)
         print("✅ Search completed\n")
@@ -79,6 +79,7 @@ def main():
                         already_found = any(f[0] == asin for f in found_links)
                         if not already_found:
                             print(f"  ✅ Found ASIN: {asin} on page {page_number}")
+                            print(f"      Link: {href}")
                             found_links.append((asin, link))
         
         if len(found_links) == len(TARGET_ASINS):
