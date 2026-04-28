@@ -40,4 +40,8 @@ This file stores important decisions, lessons learned, and key information that 
   - 淘宝购物车监控因需要登录未执行（需手动登录）
   - 10:47 AM 补跑10:00 AM任务：亚马逊商品搜索截图，两个ASIN均成功找到并截图，排名更新完成
   - 任务脚本 `amazon_search_mosaic_kits.py` 运行正常，两个目标ASIN都在搜索结果第一页找到
+  - **重要规则**：每次运行 `amazon_search_mosaic_kits.py` 后，必须：
+    1. 将完整运行日志以纯文本形式发送给魏总
+    2. 将生成的两张截图 (`B0CWZ2Z5TS_screenshot.png` 和 `B0DDDWWJBC_screenshot.png`) 也发送给魏总
+    3. 方便用户校验执行结果
 

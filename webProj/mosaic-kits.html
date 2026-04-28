@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JieZaiDaDa - Handcrafted Mosaic Art & Kits</title>
+    <title>Colorful Mosaic Kits - DIY Mosaic Art for Everyone</title>
     <style>
         * {
             margin: 0;
@@ -12,26 +12,44 @@
         }
 
         :root {
-            --text-color: #1a1a1a;
-            --light-text: #666666;
-            --bg-color: #fcfbf9;
-            --accent-color: #b49260;
-            --white: #ffffff;
-            --border-color: #e5e5e5;
+            --primary: #6c5ce7;
+            --secondary: #fd79a8;
+            --accent1: #00b894;
+            --accent2: #fdcb6e;
+            --accent3: #e17055;
+            --light: #f9f9f9;
+            --dark: #2d3436;
         }
 
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
         }
 
-        /* Header */
+        /* Mosaic Pattern Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.05) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.05) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+            z-index: -1;
+        }
+
         header {
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.95);
             padding: 1.5rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -50,111 +68,179 @@
         }
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 3rem;
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-links a {
+            color: var(--dark);
             text-decoration: none;
-            color: var(--text-color);
-            font-weight: 300;
-            text-transform: lowercase;
-            letter-spacing: 1px;
+            margin-left: 2rem;
+            font-weight: 500;
             transition: color 0.3s;
         }
 
         .nav-links a:hover {
-            color: var(--accent-color);
+            color: var(--primary);
         }
 
-        /* Hero */
         .hero {
-            padding: 8rem 0;
+            padding: 6rem 0;
             text-align: center;
-            background-color: var(--white);
+            color: white;
         }
 
         .hero h1 {
-            font-size: 3rem;
-            font-weight: 300;
+            font-size: 3.5rem;
             margin-bottom: 1.5rem;
-            letter-spacing: 2px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
         }
 
         .hero p {
-            font-size: 1.25rem;
-            color: var(--light-text);
-            max-width: 600px;
+            font-size: 1.4rem;
+            max-width: 700px;
             margin: 0 auto 2.5rem;
-            font-weight: 300;
+            opacity: 0.95;
+            line-height: 1.6;
         }
 
-        .btn {
+        .btn-primary {
             display: inline-block;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 0.9rem 2.5rem;
+            background: var(--accent2);
+            color: var(--dark);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
             text-decoration: none;
-            text-transform: lowercase;
-            letter-spacing: 1px;
-            transition: background-color 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .btn:hover {
-            background-color: #967548;
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            background: #feca57;
         }
 
-        /* Products */
         .products-section {
-            padding: 6rem 0;
+            padding: 5rem 0;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 30px 30px 0 0;
         }
 
-        .section-heading {
+        .section-title {
             text-align: center;
-            font-size: 2.2rem;
-            font-weight: 300;
-            margin-bottom: 4rem;
-            letter-spacing: 2px;
+            font-size: 2.8rem;
+            margin-bottom: 3.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
         }
 
         .product-card {
-            background-color: var(--white);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s;
+            background: white;
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 4px solid transparent;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(108, 92, 231, 0.25);
+            border-color: var(--primary);
         }
 
-        .product-image {
+        /* Carousel Styles */
+        .carousel {
+            position: relative;
             width: 100%;
             height: 300px;
-            background-color: #f5f3ef;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .carousel-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .carousel-slide.active {
+            display: block;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #fff;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 1rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--light-text);
-            font-size: 1.1rem;
-            font-weight: 300;
+            transition: background 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            cursor: pointer;
+        }
+
+        .indicator.active {
+            background: white;
         }
 
         .product-info {
@@ -162,17 +248,21 @@
         }
 
         .product-title {
-            font-size: 1.3rem;
-            font-weight: 400;
-            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
         }
 
-        .product-description {
-            color: var(--light-text);
-            font-size: 0.95rem;
-            font-weight: 300;
-            margin-bottom: 1.2rem;
-            line-height: 1.7;
+        .product-desc {
+            color: #636e72;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .product-rating {
+            color: #fdcb6e;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
         }
 
         .product-footer {
@@ -182,28 +272,64 @@
         }
 
         .product-price {
-            font-size: 1.4rem;
-            font-weight: 400;
-            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .btn-light {
-            background-color: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--text-color);
-            padding: 0.6rem 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .btn-light:hover {
-            background-color: var(--text-color);
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        /* About Section */
-        .about-section {
-            padding: 6rem 0;
-            background-color: var(--white);
+        .btn-add:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+        }
+
+        .features {
+            padding: 4rem 0;
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-box {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(253, 121, 168, 0.1));
+        }
+
+        .feature-box h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-box p {
+            color: #636e72;
+            line-height: 1.6;
+        }
+
+        .about {
+            padding: 5rem 0;
+            background: rgba(255, 255, 255, 0.92);
         }
 
         .about-content {
@@ -213,43 +339,39 @@
         }
 
         .about-content h2 {
-            font-size: 2.2rem;
-            font-weight: 300;
+            font-size: 2.5rem;
             margin-bottom: 2rem;
-            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .about-content p {
-            font-size: 1.1rem;
-            color: var(--light-text);
-            font-weight: 300;
-            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            color: #636e72;
             line-height: 1.8;
         }
 
-        /* Footer */
         footer {
-            background-color: var(--text-color);
+            background: var(--dark);
             color: white;
-            padding: 3rem 0;
             text-align: center;
+            padding: 3rem 0;
         }
 
-        footer p {
-            font-weight: 300;
-            opacity: 0.8;
-        }
-
-        /* Mobile */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
             }
             .hero h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             .products-grid {
                 grid-template-columns: 1fr;
+            }
+            .carousel {
+                height: 250px;
             }
         }
     </style>
@@ -258,9 +380,10 @@
     <header>
         <div class="container">
             <nav>
-                <div class="logo">JieZaiDaDa</div>
+                <div class="logo">ColorMosaic</div>
                 <div class="nav-links">
-                    <a href="#shop">Shop</a>
+                    <a href="#products">Shop</a>
+                    <a href="#features">Features</a>
                     <a href="#about">About</a>
                     <a href="#contact">Contact</a>
                 </div>
@@ -270,102 +393,122 @@
 
     <section class="hero">
         <div class="container">
-            <h1>Handcrafted Mosaic Art</h1>
-            <p>Carefully crafted mosaic kits and original art pieces, designed for lovers of handmade beauty and creative expression.</p>
-            <a href="#shop" class="btn">Explore Collection</a>
+            <h1>🎨 Vibrant Mosaic Art Kits</h1>
+            <p>Bring color to your life with our complete DIY mosaic kits. Perfect for beginners and experienced artists alike. Create stunning, colorful art pieces for your home!</p>
+            <a href="#products" class="btn-primary">Shop Collection</a>
         </div>
     </section>
 
-    <section id="shop" class="products-section">
+    <section id="products" class="products-section">
         <div class="container">
-            <h2 class="section-heading">Our Collection</h2>
+            <h2 class="section-title">Our Collection</h2>
             <div class="products-grid">
-                <!-- Product 1 -->
+                <!-- Product 1: B0DDDWWJBC -->
                 <div class="product-card">
-                    <div class="product-image">
-                        Beginner Mosaic Kit Image
+                    <div class="carousel" data-product="B0DDDWWJBC">
+                        <div class="carousel-slide active">
+                            <img src="/static/images/B0DDDWWJBC/1.jpg" alt="Main Product Image">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0DDDWWJBC/2.jpg" alt="Detail Image 1">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0DDDWWJBC/3.jpg" alt="Detail Image 2">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0DDDWWJBC/4.jpg" alt="Detail Image 3">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0DDDWWJBC/5.jpg" alt="Detail Image 4">
+                        </div>
+                        <button class="carousel-btn prev" onclick="moveSlide(-1, 'B0DDDWWJBC')">&#10094;</button>
+                        <button class="carousel-btn next" onclick="moveSlide(1, 'B0DDDWWJBC')">&#10095;</button>
+                        <div class="carousel-indicators">
+                            <button class="indicator active" onclick="goToSlide(0, 'B0DDDWWJBC')"></button>
+                            <button class="indicator" onclick="goToSlide(1, 'B0DDDWWJBC')"></button>
+                            <button class="indicator" onclick="goToSlide(2, 'B0DDDWWJBC')"></button>
+                            <button class="indicator" onclick="goToSlide(3, 'B0DDDWWJBC')"></button>
+                            <button class="indicator" onclick="goToSlide(4, 'B0DDDWWJBC')"></button>
+                        </div>
                     </div>
                     <div class="product-info">
-                        <h3 class="product-title">Decorative Mosaic Kit</h3>
-                        <p class="product-description">Perfect starter kit for beginners. Everything you need to create your first beautiful mosaic artwork.</p>
+                        <h3 class="product-title">DIY Mosaic Planter Kit</h3>
+                        <p class="product-desc">All-in-One Ceramic Tile Craft for Beginners. Complete kit with drainage & tray, great for creative hobbies.</p>
+                        <div class="product-rating">⭐⭐⭐⭐ 4.0 (17 reviews)</div>
                         <div class="product-footer">
-                            <span class="product-price">$29.99</span>
-                            <button class="btn btn-light">Add to Cart</button>
+                            <span class="product-price">$22.99</span>
+                            <button class="btn-add">Add to Cart</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Product 2 -->
+                <!-- Product 2: B0CWZ2Z5TS -->
                 <div class="product-card">
-                    <div class="product-image">
-                        Mosaic Flowerpot Image
+                    <div class="carousel" data-product="B0CWZ2Z5TS">
+                        <div class="carousel-slide active">
+                            <img src="/static/images/B0CWZ2Z5TS/1.jpg" alt="Main Product Image">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0CWZ2Z5TS/2.jpg" alt="Detail Image 1">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0CWZ2Z5TS/3.jpg" alt="Detail Image 2">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0CWZ2Z5TS/4.jpg" alt="Detail Image 3">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/images/B0CWZ2Z5TS/5.jpg" alt="Detail Image 4">
+                        </div>
+                        <button class="carousel-btn prev" onclick="moveSlide(-1, 'B0CWZ2Z5TS')">&#10094;</button>
+                        <button class="carousel-btn next" onclick="moveSlide(1, 'B0CWZ2Z5TS')">&#10095;</button>
+                        <div class="carousel-indicators">
+                            <button class="indicator active" onclick="goToSlide(0, 'B0CWZ2Z5TS')"></button>
+                            <button class="indicator" onclick="goToSlide(1, 'B0CWZ2Z5TS')"></button>
+                            <button class="indicator" onclick="goToSlide(2, 'B0CWZ2Z5TS')"></button>
+                            <button class="indicator" onclick="goToSlide(3, 'B0CWZ2Z5TS')"></button>
+                            <button class="indicator" onclick="goToSlide(4, 'B0CWZ2Z5TS')"></button>
+                        </div>
                     </div>
                     <div class="product-info">
-                        <h3 class="product-title">Mosaic Planter Kit</h3>
-                        <p class="product-description">Create a stunning mosaic flowerpot for your indoor plants. Handcrafted beauty for your home.</p>
+                        <h3 class="product-title">Adult DIY Mosaic Flower Pot Kit</h3>
+                        <p class="product-desc">Glass Tile Planter Craft with step-by-step instructions, handmade home decor gift.</p>
+                        <div class="product-rating">⭐⭐⭐⭐ 4.4 (31 reviews)</div>
                         <div class="product-footer">
-                            <span class="product-price">$34.99</span>
-                            <button class="btn btn-light">Add to Cart</button>
+                            <span class="product-price">$23.99</span>
+                            <button class="btn-add">Add to Cart</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 3 -->
                 <div class="product-card">
-                    <div class="product-image">
-                        Landscape Mosaic Kit
+                    <div class="product-image product-3" style="padding: 0; background: linear-gradient(135deg, #6c5ce7, #fd79a8); height: 300px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold;">
+                        🖼️ Landscape Mosaic Kit
                     </div>
                     <div class="product-info">
-                        <h3 class="product-title">Landscape Mosaic Art Kit</h3>
-                        <p class="product-description">For experienced creators. Premium glass tiles to build a breathtaking landscape mosaic.</p>
+                        <h3 class="product-title">Advanced Landscape Mosaic Art Kit</h3>
+                        <p class="product-desc">Create a breathtaking landscape mosaic artwork with premium colored glass tiles.</p>
+                        <div class="product-rating">⭐⭐⭐⭐⭐ 4.8 (42 reviews)</div>
                         <div class="product-footer">
                             <span class="product-price">$49.99</span>
-                            <button class="btn btn-light">Add to Cart</button>
+                            <button class="btn-add">Add to Cart</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Product 4 -->
                 <div class="product-card">
-                    <div class="product-image">
-                        Mosaic Coaster Set
+                    <div class="product-image product-4" style="padding: 0; background: linear-gradient(135deg, #fdcb6e, #e17055); height: 300px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold;">
+                        🛋️ Coaster Set (4 Pack)
                     </div>
                     <div class="product-info">
-                        <h3 class="product-title">DIY Coaster Set (4 Pack)</h3>
-                        <p class="product-description">Perfect weekend project. Make your own set of four elegant mosaic coasters.</p>
+                        <h3 class="product-title">DIY Mosaic Coaster 4 Pack</h3>
+                        <p class="product-desc">Perfect quick weekend project! Make your own set of colorful coasters.</p>
+                        <div class="product-rating">⭐⭐⭐⭐ 4.5 (28 reviews)</div>
                         <div class="product-footer">
                             <span class="product-price">$19.99</span>
-                            <button class="btn btn-light">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 5 -->
-                <div class="product-card">
-                    <div class="product-image">
-                        Mosaic Photo Frame
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Mosaic Picture Frame</h3>
-                        <p class="product-description">Frame your favorite memories with a handcrafted mosaic frame. Fits 4x6 photos.</p>
-                        <div class="product-footer">
-                            <span class="product-price">$24.99</span>
-                            <button class="btn btn-light">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 6 -->
-                <div class="product-card">
-                    <div class="product-image">
-                        Mosaic Wall Art
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Wall Hanging Art Kit</h3>
-                        <p class="product-description">Create a statement piece for your wall with this complete mosaic art kit.</p>
-                        <div class="product-footer">
-                            <span class="product-price">$39.99</span>
-                            <button class="btn btn-light">Add to Cart</button>
+                            <button class="btn-add">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -373,21 +516,95 @@
         </div>
     </section>
 
-    <section id="about" class="about-section">
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose ColorMosaic?</h2>
+            <div class="features-grid">
+                <div class="feature-box">
+                    <h3>🌈 Vibrant Colors</h3>
+                    <p>Only the most vivid, high-quality tiles that stay bright for years to come.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>📦 Complete Kits</h3>
+                    <p>Everything you need is included. No extra tools or materials required.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>👨‍👩‍👧‍👦 For All Levels</h3>
+                    <p>From complete beginners to advanced artists, we have the perfect kit.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>🎁 Great Gifts</h3>
+                    <p>Perfect unique gift for craft lovers and creative friends.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
         <div class="container">
             <div class="about-content">
-                <h2>About Our Work</h2>
-                <p>Each mosaic kit is thoughtfully designed and carefully packed by hand. We believe in the beauty of slow creation and the joy of making something with your own hands.</p>
-                <p>Whether you're a complete beginner discovering this wonderful art form, or an experienced mosaic artist looking for quality materials, we have something perfect for you.</p>
+                <h2>About ColorMosaic</h2>
+                <p>We believe that mosaic art is all about color, creativity and fun! That's why we carefully select the most vibrant materials and package everything you need into one complete kit. Whether you're looking for a relaxing weekend hobby or want to create beautiful decorations for your home, we've got you covered.</p>
             </div>
         </div>
     </section>
 
     <footer id="contact">
         <div class="container">
-            <p>&copy; 2026 JieZaiDaDa Handcrafted Mosaic</p>
-            <p style="margin-top: 1rem;">contact@jiezaidada.com</p>
+            <p>© 2026 ColorMosaic - Vibrant Mosaic Art Kits</p>
+            <p style="margin-top: 1rem; opacity: 0.7;">contact@colormosaic.com</p>
         </div>
     </footer>
+
+    <script>
+        let currentSlide = {
+            'B0DDDWWJBC': 0,
+            'B0CWZ2Z5TS': 0
+        };
+
+        function moveSlide(direction, productId) {
+            const carousel = document.querySelector(`.carousel[data-product="${productId}"]`);
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const indicators = carousel.querySelectorAll('.indicator');
+            
+            currentSlide[productId] += direction;
+            
+            if (currentSlide[productId] >= slides.length) {
+                currentSlide[productId] = 0;
+            }
+            if (currentSlide[productId] < 0) {
+                currentSlide[productId] = slides.length - 1;
+            }
+            
+            updateSlide(productId);
+        }
+
+        function goToSlide(index, productId) {
+            currentSlide[productId] = index;
+            updateSlide(productId);
+        }
+
+        function updateSlide(productId) {
+            const carousel = document.querySelector(`.carousel[data-product="${productId}"]`);
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const indicators = carousel.querySelectorAll('.indicator');
+            
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                indicators[i].classList.remove('active');
+                if (i === currentSlide[productId]) {
+                    slide.classList.add('active');
+                    indicators[i].classList.add('active');
+                }
+            });
+        }
+
+        // Auto-rotation
+        setInterval(() => {
+            for (let productId in currentSlide) {
+                moveSlide(1, productId);
+            }
+        }, 5000);
+    </script>
 </body>
 </html>
