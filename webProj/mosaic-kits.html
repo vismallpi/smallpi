@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JieZaiDaDa - Handcrafted Mosaic Art & Kits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --text-color: #1a1a1a;
+            --light-text: #666666;
+            --bg-color: #fcfbf9;
+            --accent-color: #b49260;
+            --white: #ffffff;
+            --border-color: #e5e5e5;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 300;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 8rem 0;
+            text-align: center;
+            background-color: var(--white);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--light-text);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            font-weight: 300;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.9rem 2.5rem;
+            text-decoration: none;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background-color: #967548;
+        }
+
+        /* Products */
+        .products-section {
+            padding: 6rem 0;
+        }
+
+        .section-heading {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 300;
+            margin-bottom: 4rem;
+            letter-spacing: 2px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .product-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 300px;
+            background-color: #f5f3ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .product-info {
+            padding: 1.8rem;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-description {
+            color: var(--light-text);
+            font-size: 0.95rem;
+            font-weight: 300;
+            margin-bottom: 1.2rem;
+            line-height: 1.7;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--accent-color);
+        }
+
+        .btn-light {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-light:hover {
+            background-color: var(--text-color);
+            color: white;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 6rem 0;
+            background-color: var(--white);
+        }
+
+        .about-content {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-content h2 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+        }
+
+        .about-content p {
+            font-size: 1.1rem;
+            color: var(--light-text);
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--text-color);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        footer p {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">JieZaiDaDa</div>
+                <div class="nav-links">
+                    <a href="#shop">Shop</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Handcrafted Mosaic Art</h1>
+            <p>Carefully crafted mosaic kits and original art pieces, designed for lovers of handmade beauty and creative expression.</p>
+            <a href="#shop" class="btn">Explore Collection</a>
+        </div>
+    </section>
+
+    <section id="shop" class="products-section">
+        <div class="container">
+            <h2 class="section-heading">Our Collection</h2>
+            <div class="products-grid">
+                <!-- Product 1 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        Beginner Mosaic Kit Image
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">Decorative Mosaic Kit</h3>
+                        <p class="product-description">Perfect starter kit for beginners. Everything you need to create your first beautiful mosaic artwork.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$29.99</span>
+                            <button class="btn btn-light">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        Mosaic Flowerpot Image
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">Mosaic Planter Kit</h3>
+                        <p class="product-description">Create a stunning mosaic flowerpot for your indoor plants. Handcrafted beauty for your home.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$34.99</span>
+                            <button class="btn btn-light">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        Landscape Mosaic Kit
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">Landscape Mosaic Art Kit</h3>
+                        <p class="product-description">For experienced creators. Premium glass tiles to build a breathtaking landscape mosaic.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$49.99</span>
+                            <button class="btn btn-light">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        Mosaic Coaster Set
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">DIY Coaster Set (4 Pack)</h3>
+                        <p class="product-description">Perfect weekend project. Make your own set of four elegant mosaic coasters.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$19.99</span>
+                            <button class="btn btn-light">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        Mosaic Photo Frame
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">Mosaic Picture Frame</h3>
+                        <p class="product-description">Frame your favorite memories with a handcrafted mosaic frame. Fits 4x6 photos.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$24.99</span>
+                            <button class="btn btn-light">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 6 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        Mosaic Wall Art
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">Wall Hanging Art Kit</h3>
+                        <p class="product-description">Create a statement piece for your wall with this complete mosaic art kit.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$39.99</span>
+                            <button class="btn btn-light">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <h2>About Our Work</h2>
+                <p>Each mosaic kit is thoughtfully designed and carefully packed by hand. We believe in the beauty of slow creation and the joy of making something with your own hands.</p>
+                <p>Whether you're a complete beginner discovering this wonderful art form, or an experienced mosaic artist looking for quality materials, we have something perfect for you.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container">
+            <p>&copy; 2026 JieZaiDaDa Handcrafted Mosaic</p>
+            <p style="margin-top: 1rem;">contact@jiezaidada.com</p>
+        </div>
+    </footer>
+</body>
+</html>

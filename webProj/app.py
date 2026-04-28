@@ -234,6 +234,13 @@ def index():
 def vocab():
     return open('vocab.html', 'r', encoding='utf-8').read()
 
+# Mosaic Kits独立站
+@app.route('/mosaic')
+@app.route('/mosaic-kits')
+@app.route('/mosaic-kits.html')
+def mosaic():
+    return open('mosaic-kits.html', 'r', encoding='utf-8').read()
+
 # ====================
 # 页面标题存储（后端存储）
 # ====================

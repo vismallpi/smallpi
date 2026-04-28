@@ -17,7 +17,7 @@
 - Post to: 当前群聊 (chat_id: oc_8fbfbbc914440f5be361a878c0e10d20)
 
 ## Daily automatic tasks: Product page screenshot + Amazon category ranking update
-- Frequency: every day at 10:00 AM GMT+8 and 10:00 PM GMT+8
+- Frequency: every day at 7:00 AM GMT+8 and 7:00 PM GMT+8
 - Tasks:
   1. Run the automation script: `cd /root/.openclaw/workspace/Amazon && python ./amazon_search_mosaic_kits.py`
   2. Capture the full running log, send it to 魏总 in plain text format (no code block collapsing, fully expanded)

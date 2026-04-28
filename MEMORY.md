@@ -33,3 +33,11 @@ This file stores important decisions, lessons learned, and key information that 
 1. ✅ 每次改动代码，必须更新前端版本号（notion-style-todo.html 中显示）
 2. ✅ 每次代码改动，必须先做测试，确认测试成功后再发布给用户
 
+## 2026-04-28
+
+- 每日任务执行情况：
+  - 07:10 AM 已完成：汇率天气预报发送、亚马逊排名更新、GitHub备份
+  - 淘宝购物车监控因需要登录未执行（需手动登录）
+  - 10:47 AM 补跑10:00 AM任务：亚马逊商品搜索截图，两个ASIN均成功找到并截图，排名更新完成
+  - 任务脚本 `amazon_search_mosaic_kits.py` 运行正常，两个目标ASIN都在搜索结果第一页找到
+
