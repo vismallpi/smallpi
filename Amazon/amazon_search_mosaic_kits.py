@@ -24,7 +24,7 @@ BASE_URL = "https://www.amazon.com"
 SEARCH_URL = "https://www.amazon.com/s"
 SCREENSHOT_DIR = "/root/.openclaw/workspace/Amazon/screenshots"
 REQUEST_TIMEOUT = 180  # 3 minutes for requests
-MAX_RETRIES = 3
+MAX_RETRIES = 1
 # 接收log的飞书用户open_id
 FEISHU_RECEIVER_ID = "ou_a331505193726d421fb0108a11bc6197"
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
@@ -129,90 +129,6 @@ def search_and_find_asins():
     send_log_to_feishu(log_text)
     return found_hrefs
 
-def get_category_ranking(driver, asin):
-    """Extract category ranking from Amazon product page, specifically look for Best Sellers Rank in Product Specifications"""
-    rankings = []
-    from selenium.webdriver.common.by import By
-    try:
-        # Method 1: Search any product details section (common ids)
-        product_details_ids = [
-            "productDetails_detailBullets_sections1",
-            "productDetails_techSpec_section_1",
-            "productDetails_detailBullets"
-        ]
-        for detail_id in product_details_ids:
-            if rankings:
-                break
-            product_details = driver.find_elements(By.ID, detail_id)
-            if product_details:
-                text = product_details[0].text
-                lines = text.split("\n")
-                for line in lines:
-                    line = line.strip()
-                    if "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
-                        rankings.append(line)
-                        break
-        
-        # Method 2: Look for any table on page that contains Best Sellers Rank
-        if not rankings:
-            all_tables = driver.find_elements(By.TAG_NAME, "table")
-            for table in all_tables:
-                if rankings:
-                    break
-                text = table.text
-                lines = text.split("\n")
-                for line in lines:
-                    line = line.strip()
-                    if "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
-                        rankings.append(line)
-                        break
-        
-        # Method 3: If still not found, search entire page text
-        if not rankings:
-            body = driver.find_element(By.TAG_NAME, "body")
-            text = body.text
-            lines = text.split("\n")
-            # First look directly for the pattern
-            for line in lines:
-                line = line.strip()
-                if "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
-                    rankings.append(line)
-                    break
-            # If still not found, look after Best Sellers Rank
-            if not rankings:
-                found_best_sellers = False
-                for line in lines:
-                    line = line.strip()
-                    if "Best Sellers Rank" in line or "best seller" in line.lower():
-                        found_best_sellers = True
-                    if found_best_sellers and "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
-                        rankings.append(line)
-                        break
-        
-        # Method 4: Look for any best seller list items
-        if not rankings:
-            try:
-                rank_items = driver.find_elements(By.CSS_SELECTOR, "#bestSellersList tr")
-                for item in rank_items:
-                    text = item.text.strip()
-                    if "#" in text and "mosaic" in text.lower() and "tile" in text.lower():
-                        rankings.append(text)
-                        break
-            except Exception:
-                pass
-        
-        # Send all found rankings to Feishu
-        if rankings:
-            for rank in rankings:
-                send_log_to_feishu(f"  📊 {asin} Category Ranking: {rank}")
-        else:
-            send_log_to_feishu(f"  ⚠️ {asin}: No category ranking found")
-        
-        return rankings
-    except Exception as e:
-        send_log_to_feishu(f"  ⚠️ Failed to extract ranking for {asin}: {type(e).__name__}: {e}")
-        return []
-
 def send_screenshot_to_feishu(screenshot_path, asin):
     """Send screenshot file to Feishu dialog"""
     try:
@@ -267,14 +183,13 @@ def take_screenshots(found_hrefs):
         send_log_to_feishu(log_text)
         for retry in range(MAX_RETRIES):
             try:
-                log_text = f"  Attempt {retry + 1}/{MAX_RETRIES}: Opening {asin}"
+                log_text = f"  Opening {asin}"
                 print(log_text)
                 send_log_to_feishu(log_text)
                 driver.get(href)
                 time.sleep(30)  # Wait for page load
                 
                 # Check for Amazon bot check page buttons
-                bot_check_handled = False
                 # 1. Try "Continue shopping" button
                 try:
                     buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Continue shopping')]")
@@ -284,64 +199,54 @@ def take_screenshots(found_hrefs):
                         send_log_to_feishu(log_text)
                         buttons[0].click()
                         time.sleep(15)  # Wait for page reload after click
-                        bot_check_handled = True
                 except Exception as e:
                     pass
                 
                 # 2. Try "Try again" button (robot check page)
-                if not bot_check_handled:
-                    try:
-                        buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Try again')]")
-                        if buttons:
-                            log_text = f"  🔘 Found 'Try again' button (robot check), clicking..."
-                            print(log_text)
-                            send_log_to_feishu(log_text)
-                            buttons[0].click()
-                            time.sleep(15)  # Wait for page reload after click
-                            bot_check_handled = True
-                    except Exception as e:
-                        pass
+                try:
+                    buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Try again')]")
+                    if buttons:
+                        log_text = f"  🔘 Found 'Try again' button (robot check), clicking..."
+                        print(log_text)
+                        send_log_to_feishu(log_text)
+                        buttons[0].click()
+                        time.sleep(15)  # Wait for page reload after click
+                except Exception as e:
+                    pass
                 
                 # 3. Try any "Continue" button
-                if not bot_check_handled:
-                    try:
-                        buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Continue')]")
-                        if buttons:
-                            log_text = f"  🔘 Found 'Continue' button, clicking..."
-                            print(log_text)
-                            send_log_to_feishu(log_text)
-                            buttons[0].click()
-                            time.sleep(15)  # Wait for page reload after click
-                    except Exception as e:
-                        pass
+                try:
+                    buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Continue')]")
+                    if buttons:
+                        log_text = f"  🔘 Found 'Continue' button, clicking..."
+                        print(log_text)
+                        send_log_to_feishu(log_text)
+                        buttons[0].click()
+                        time.sleep(15)  # Wait for page reload after click
+                except Exception as e:
+                    pass
                 
-                # Scroll to bottom of page to load all content including Product Specifications
+                # Scroll to bottom of page to load all content
                 try:
                     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(10)  # Wait for content to load after scrolling
                 except Exception as e:
                     pass
                 
-                # 1. Get category ranking
-                log_text = f"  Extracting category ranking..."
-                print(log_text)
-                send_log_to_feishu(log_text)
-                rankings = get_category_ranking(driver, asin)
-                
-                # 2. Take screenshot
+                # Take screenshot
                 screenshot_path = os.path.join(SCREENSHOT_DIR, f"{asin}_screenshot.png")
                 driver.save_screenshot(screenshot_path)
                 log_text = f"  ✅ Screenshot saved: {screenshot_path}"
                 print(log_text)
                 send_log_to_feishu(log_text)
                 
-                # 3. Send screenshot to Feishu
+                # Send screenshot to Feishu
                 send_screenshot_to_feishu(screenshot_path, asin)
                 
                 success_count += 1
                 break
             except Exception as e:
-                log_text = f"  ❌ Attempt {retry + 1} failed: {type(e).__name__}: {e}\n"
+                log_text = f"  ❌ Attempt failed: {type(e).__name__}: {e}\n"
                 print(log_text)
                 send_log_to_feishu(log_text)
                 if retry < MAX_RETRIES - 1:
