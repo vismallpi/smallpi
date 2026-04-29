@@ -134,62 +134,72 @@ def get_category_ranking(driver, asin):
     rankings = []
     from selenium.webdriver.common.by import By
     try:
-        # Method 1: Look specifically for Product Specifications section
-        product_spec_headers = driver.find_elements(By.XPATH, "//*[contains(text(), 'Product Specifications')]")
-        if product_spec_headers:
-            # Get the table after Product Specifications
-            for header in product_spec_headers:
-                try:
-                    # Find the next table after this header
-                    table = header.find_element(By.XPATH, "./following::table[1]")
-                    text = table.text
-                    lines = text.split("\n")
-                    # Look for Best Sellers Rank and then the mosaic tile line
-                    for i, line in enumerate(lines):
-                        if "Best Sellers" in line or "best seller" in line.lower():
-                            # Check next lines for mosaic tile ranking
-                            for check_line in lines[i+1:]:
-                                check_line = check_line.strip()
-                                if "#" in check_line and "mosaic" in check_line.lower() and "tile" in check_line.lower():
-                                    rankings.append(check_line)
-                                    break
-                            break
-                    # If not found in this table, search entire table text
-                    if not rankings:
-                        for line in lines:
-                            line = line.strip()
-                            if "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
-                                rankings.append(line)
-                                break
-                    if rankings:
+        # Method 1: Search any product details section (common ids)
+        product_details_ids = [
+            "productDetails_detailBullets_sections1",
+            "productDetails_techSpec_section_1",
+            "productDetails_detailBullets"
+        ]
+        for detail_id in product_details_ids:
+            if rankings:
+                break
+            product_details = driver.find_elements(By.ID, detail_id)
+            if product_details:
+                text = product_details[0].text
+                lines = text.split("\n")
+                for line in lines:
+                    line = line.strip()
+                    if "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
+                        rankings.append(line)
                         break
-                except Exception:
-                    continue
         
-        # Method 2: If not found in table, search entire page text
+        # Method 2: Look for any table on page that contains Best Sellers Rank
+        if not rankings:
+            all_tables = driver.find_elements(By.TAG_NAME, "table")
+            for table in all_tables:
+                if rankings:
+                    break
+                text = table.text
+                lines = text.split("\n")
+                for line in lines:
+                    line = line.strip()
+                    if "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
+                        rankings.append(line)
+                        break
+        
+        # Method 3: If still not found, search entire page text
         if not rankings:
             body = driver.find_element(By.TAG_NAME, "body")
             text = body.text
             lines = text.split("\n")
+            # First look directly for the pattern
             for line in lines:
                 line = line.strip()
                 if "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
                     rankings.append(line)
                     break
+            # If still not found, look after Best Sellers Rank
+            if not rankings:
+                found_best_sellers = False
+                for line in lines:
+                    line = line.strip()
+                    if "Best Sellers Rank" in line or "best seller" in line.lower():
+                        found_best_sellers = True
+                    if found_best_sellers and "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
+                        rankings.append(line)
+                        break
         
-        # Method 3: Look for any Best Sellers Rank that contains mosaic
+        # Method 4: Look for any best seller list items
         if not rankings:
-            body = driver.find_element(By.TAG_NAME, "body")
-            text = body.text
-            lines = text.split("\n")
-            found_best_sellers = False
-            for line in lines:
-                line = line.strip()
-                if "Best Sellers Rank" in line:
-                    found_best_sellers = True
-                if found_best_sellers and "#" in line and "mosaic" in line.lower() and "tile" in line.lower():
-                    rankings.append(line)
-                    break
+            try:
+                rank_items = driver.find_elements(By.CSS_SELECTOR, "#bestSellersList tr")
+                for item in rank_items:
+                    text = item.text.strip()
+                    if "#" in text and "mosaic" in text.lower() and "tile" in text.lower():
+                        rankings.append(text)
+                        break
+            except Exception:
+                pass
         
         # Send all found rankings to Feishu
         if rankings:
