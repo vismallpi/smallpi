@@ -36,6 +36,12 @@
       "zip_url": "https://lightmake.site/api/v1/download?slug=taobao",
       "source": "skillhub",
       "version": "1.0.2"
+    },
+    "amazon-product-search-api-skill": {
+      "name": "Amazon Product Search Api Skill",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=amazon-product-search-api-skill",
+      "source": "skillhub",
+      "version": "0.1.2"
     }
   }
 }

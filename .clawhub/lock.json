@@ -8,6 +8,10 @@
     "speech-writer": {
       "version": "1.0.0",
       "installedAt": 1775375279572
+    },
+    "amazon-product-search-api-skill": {
+      "version": "0.1.2",
+      "installedAt": 1777566129316
     }
   }
 }
