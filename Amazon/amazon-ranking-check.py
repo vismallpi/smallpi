@@ -117,8 +117,8 @@ def main():
         info = get_product_info(asin)
         data.append(info)
     
-    # Write to Bitable (disabled for direct execution, will handle via openclaw)
-    # write_to_bitable(data)
+    # Write to Bitable
+    write_to_bitable(data)
     
     # Generate markdown message
     message = "📊 **Amazon Product All Categories Ranking**\n\n"
