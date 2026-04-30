@@ -227,10 +227,10 @@ def take_screenshots(found_hrefs):
                 except Exception as e:
                     pass
                 
-                # Scroll to bottom of page to load all content
+                # Scroll to top of page to show search result position in screenshot
                 try:
-                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    time.sleep(10)  # Wait for content to load after scrolling
+                    driver.execute_script("window.scrollTo(0, 0);")
+                    time.sleep(5)  # Wait for content to stabilize
                 except Exception as e:
                     pass
                 
