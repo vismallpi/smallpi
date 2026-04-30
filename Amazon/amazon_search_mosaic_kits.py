@@ -171,7 +171,8 @@ def take_screenshots(found_hrefs):
     }
     chrome_options.add_experimental_option("prefs", prefs)
     
-    service = Service(ChromeDriverManager().install())
+    # Use system installed chromedriver instead of downloading
+    service = Service(executable_path='/usr/bin/chromedriver')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.set_page_load_timeout(300)  # 5 minutes
     
