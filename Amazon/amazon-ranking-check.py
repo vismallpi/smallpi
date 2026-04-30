@@ -68,13 +68,13 @@ def get_product_info(asin):
         'num_reviews': num_reviews
     }
 
-def write_to_bitable(data):
-    """Write ranking data to Feishu Bitable"""
+def prepare_bitable_records(data):
+    """Prepare records for Bitable writing with correct timestamp"""
     # Bitable info
     app_token = "I2VNbkpkTaUDISsACs5ctFDgnte"
     table_id = "tblUhqzVlCHz309V"
     
-    # Get current timestamp (milliseconds)
+    # Get current timestamp (milliseconds) - THIS IS CORRECT!
     now = datetime.now()
     query_date = int(now.timestamp() * 1000)
     query_text = now.strftime('%Y-%m-%d %H:%M')  # 精确到时分，方便区分早晚
@@ -93,32 +93,24 @@ def write_to_bitable(data):
         }
         records.append({"fields": fields})
     
-    # Add records via openclaw feishu tool
-    from feishu_bitable_app_table_record import feishu_bitable_app_table_record
-    # Call batch create directly
-    result = None
-    try:
-        import openclaw
-        result = openclaw.tools.feishu_bitable_app_table_record(
-            action="batch_create",
-            app_token=app_token,
-            table_id=table_id,
-            records=records
-        )
-        print(f"✅ 成功写入 {len(records)} 条排名记录到多维表格")
-    except Exception as e:
-        print(f"⚠️  写入多维表格异常: {str(e)}")
+    return {
+        "action": "batch_create",
+        "app_token": app_token,
+        "table_id": table_id,
+        "records": records
+    }
 
 def main():
     from datetime import datetime
+    import json
     asins = ['B0DDDWWJBC', 'B0CWZ2Z5TS']
     data = []
     for asin in asins:
         info = get_product_info(asin)
         data.append(info)
     
-    # Write to Bitable
-    write_to_bitable(data)
+    # Prepare records and write via openclaw (when run in openclaw context)
+    bitable_request = prepare_bitable_records(data)
     
     # Generate markdown message
     message = "📊 **Amazon Product All Categories Ranking**\n\n"
@@ -138,8 +130,13 @@ def main():
     message += f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} GMT+8\n"
     message += f"\n✅ 数据已自动记录到飞书多维表格「亚马逊排名历史」\n"
     
-    # Print output for OpenClaw to send to Feishu
+    # Print output
     print(message)
+    
+    # Also output the bitable request as json for openclaw to use
+    print("\n--- BITABLE_REQUEST_BEGIN ---")
+    print(json.dumps(bitable_request, indent=2))
+    print("--- BITABLE_REQUEST_END ---")
 
 if __name__ == "__main__":
     main()
