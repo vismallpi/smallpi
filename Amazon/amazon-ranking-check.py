@@ -30,6 +30,8 @@ def get_product_info(asin):
             clean_category = ' '.join(clean_category.replace('\n', ' ').split()).strip().rstrip('(').strip()
             # Cut off at the next HTML element or ASIN
             clean_category = re.sub(r' ASIN.*$', '', clean_category)
+            # Unescape HTML entities
+            clean_category = clean_category.replace('&amp;', '&')
             if clean_category and clean_rank != '' and len(clean_category) < 50 and clean_category != '':
                 all_ranks.append({
                     'rank': clean_rank,
