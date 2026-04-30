@@ -19,7 +19,7 @@ from selenium.webdriver.chrome.service import Service
 
 # Configuration
 TARGET_ASINS = ["B0DDDWWJBC", "B0CWZ2Z5TS"]
-SEARCH_KEYWORD = "mosaic craft kits for beginner"
+SEARCH_KEYWORD = "art crafts for kits"
 BASE_URL = "https://www.amazon.com"
 SEARCH_URL = "https://www.amazon.com/s"
 SCREENSHOT_DIR = "/root/.openclaw/workspace/Amazon/screenshots"
