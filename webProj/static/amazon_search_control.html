@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>亚马逊关键词搜索控制</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #f5f5f5f;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .script-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1976D2;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>亚马逊关键词搜索控制面板</h1>
+
+        <div class="script-item">
+            <h2>1. 定时自动运行脚本 - amazon_search_mosaic_kits.py</h2>
+            <div class="description">
+                <strong>功能：</strong> 按照配置自动搜索，找到两个目标ASIN (<code>B0DDDWWJBC</code> 和 <code>B0CWZ2Z5TS</code>)，搜索完成后自动发送日志和截图给你。<br>
+                当前搜索关键词已经配置为：<code>mosaic kits for adults</code>
+            </div>
+            <button onclick="runScript('amazon_search_mosaic_kits.py')">立即运行</button>
+        </div>
+
+        <div class="script-item">
+            <h2>2. 手动单个搜索 - amazon_search_asin_screenshot.py</h2>
+            <div class="description">
+                <strong>功能：</strong> 自定义输入搜索关键词和目标ASIN，自动搜索找到位置后截图保存。
+            </div>
+            <div class="input-group">
+                <label for="keyword">搜索关键词：</label>
+                <input type="text" id="keyword" placeholder="例如: mosaic kits for adults">
+            </div>
+            <div class="input-group">
+                <label for="asin">目标ASIN：</label>
+                <input type="text" id="asin" placeholder="例如: B0DDDWWJBC">
+            </div>
+            <button onclick="runManualSearch()">运行搜索</button>
+        </div>
+
+        <div class="script-item">
+            <h2>3. 逐页全截图 - search_each_page_screenshot.py</h2>
+            <div class="description">
+                <strong>功能：</strong> 搜索指定关键词，搜索1-5页，<strong>每一页都保存截图</strong>，即使没找到目标ASIN也保存所有页面截图。
+            </div>
+            <div class="input-group">
+                <label for="keyword_full">搜索关键词：</label>
+                <input type="text" id="keyword_full" placeholder="例如: mosaic beginner">
+            </div>
+            <div class="input-group">
+                <label for="asin_full">目标ASIN：</label>
+                <input type="text" id="asin_full" placeholder="例如: B0DDDWWJBC">
+            </div>
+            <button onclick="runFullPageScreenshot()">运行逐页全截图</button>
+        </div>
+
+        <div class="note">
+            <strong>使用说明：</strong><br>
+            1. 在对应区块填写好参数（关键词 / ASIN）<br>
+            2. 把你要运行哪个脚本告诉我（或者直接截图网页）<br>
+            3. 我会在服务器后台帮你运行脚本，运行结果和截图会自动发送到你的飞书聊天窗口 ✅
+        </div>
+    </div>
+
+    <script>
+        async function runScript(scriptName) {
+            if (scriptName === 'amazon_search_mosaic_kits.py') {
+                try {
+                    const response = await fetch('/api/run-auto-search', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                    } else {
+                        alert('运行失败: ' + result.error);
+                    }
+                } catch (error) {
+                    alert('请求失败: ' + error.message);
+                }
+            }
+        }
+
+        async function runManualSearch() {
+            const keyword = document.getElementById('keyword').value;
+            const asin = document.getElementById('asin').value;
+            if (!keyword || !asin) {
+                alert('请填写搜索关键词和目标ASIN！');
+                return;
+            }
+            try {
+                const response = await fetch('/api/run-manual-search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ keyword, asin })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                } else {
+                    alert('运行失败: ' + result.error);
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+
+        async function runFullPageScreenshot() {
+            const keyword = document.getElementById('keyword_full').value;
+            const asin = document.getElementById('asin_full').value;
+            if (!keyword || !asin) {
+                alert('请填写搜索关键词和目标ASIN！');
+                return;
+            }
+            try {
+                const response = await fetch('/api/run-fullpage-screenshot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ keyword, asin })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                } else {
+                    alert('运行失败: ' + result.error);
+                }
+            } catch (error) {
+                alert('请求失败: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

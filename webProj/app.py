@@ -286,6 +286,100 @@ def save_page_title():
     
     return jsonify({'success': True})
 
+# 添加API：运行亚马逊搜索脚本
+import subprocess
+import os
+
+@app.route('/api/run-auto-search', methods=['POST'])
+def run_auto_search():
+    """运行定时自动搜索脚本 amazon_search_mosaic_kits.py"""
+    try:
+        cmd = "cd /root/.openclaw/workspace/Amazon && python3 ./amazon_search_mosaic_kits.py"
+        # 后台运行
+        subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return jsonify({
+            'success': True,
+            'message': '已开始后台运行，请稍候等待结果发送到飞书...'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
+@app.route('/api/run-manual-search', methods=['POST'])
+def run_manual_search():
+    """运行手动单个搜索"""
+    data = request.get_json()
+    keyword = data.get('keyword')
+    asin = data.get('asin')
+    
+    if not keyword or not asin:
+        return jsonify({'success': False, 'error': '请填写关键词和ASIN'})
+    
+    try:
+        # 需要修改脚本里的关键词和ASIN，然后运行
+        script_path = "/root/.openclaw/workspace/Amazon/amazon_search_asin_screenshot.py"
+        # 读取脚本，替换关键词和ASIN
+        with open(script_path, 'r') as f:
+            content = f.read()
+        
+        content = content.replace('SEARCH_KEYWORD = "', f'SEARCH_KEYWORD = "{keyword}')
+        content = content.replace('TARGET_ASIN = "', f'TARGET_ASIN = "{asin}')
+        
+        with open(script_path, 'w') as f:
+            f.write(content)
+        
+        # 后台运行
+        cmd = f"cd /root/.openclaw/workspace/Amazon && python3 ./amazon_search_asin_screenshot.py"
+        subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        return jsonify({
+            'success': True,
+            'message': f'已开始后台运行，关键词: {keyword}, ASIN: {asin}\n结果会发送到飞书，请稍候...'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
+@app.route('/api/run-fullpage-screenshot', methods=['POST'])
+def run_fullpage_screenshot():
+    """运行逐页全截图"""
+    data = request.get_json()
+    keyword = data.get('keyword')
+    asin = data.get('asin')
+    
+    if not keyword or not asin:
+        return jsonify({'success': False, 'error': '请填写关键词和ASIN'})
+    
+    try:
+        # 修改脚本里的关键词和ASIN
+        script_path = "/root/.openclaw/workspace/Amazon/search_each_page_screenshot.py"
+        with open(script_path, 'r') as f:
+            content = f.read()
+        
+        content = content.replace('SEARCH_KEYWORD = "', f'SEARCH_KEYWORD = "{keyword}')
+        content = content.replace('TARGET_ASIN = "', f'TARGET_ASIN = "{asin}')
+        
+        with open(script_path, 'w') as f:
+            f.write(content)
+        
+        # 后台运行
+        cmd = f"cd /root/.openclaw/workspace/Amazon && python3 ./search_each_page_screenshot.py"
+        subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        return jsonify({
+            'success': True,
+            'message': f'已开始后台逐页全截图，关键词: {keyword}, ASIN: {asin}\n所有页面截图都会发送到飞书，请稍候...'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
 if __name__ == '__main__':
     # 同时启用 HTTP (8081) 和 HTTPS (8080)
     import threading
