@@ -5,133 +5,247 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>亚马逊关键词搜索控制</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: #f5f5f5f;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background-color: #f7f6f3;
+            color: #37352f;
+            line-height: 1.5;
+            min-height: 100vh;
         }
+
         .container {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
         }
+
         h1 {
-            color: #333;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 36px;
+            color: #37352f;
+            padding-top: 10px;
             text-align: center;
-            margin-bottom: 30px;
         }
+
+        .version-info {
+            font-size: 12px;
+            color: #9b9a97;
+            margin-bottom: 24px;
+            margin-top: -28px;
+            line-height: 1.4;
+            text-align: center;
+        }
+
         .script-item {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            background-color: #fafafa;
+            margin-bottom: 24px;
+            background-color: #ffffff;
+            border: 1px solid #e9e9e7;
+            border-radius: 2px;
+            padding: 20px 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
+
         h2 {
-            color: #2c3e50;
+            font-size: 18px;
+            font-weight: 600;
+            color: #37352f;
             margin-top: 0;
             margin-bottom: 10px;
         }
+
         .description {
-            color: #666;
-            margin-bottom: 15px;
+            color: #6e6e6e;
+            margin-bottom: 16px;
             line-height: 1.6;
         }
+
         .input-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
-            color: #555;
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            color: #37352f;
+            font-weight: 500;
             font-size: 14px;
         }
-        button {
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e9e9e7;
+            border-radius: 2px;
             font-size: 16px;
+            background-color: #fafafa;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4A6FA5;
+            background-color: #ffffff;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #A9C5ED;
+            color: #2d3b55;
+            border: 1px solid #8CA6D9;
+            border-radius: 2px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s;
+            min-height: 44px;
         }
+
         button:hover {
-            background-color: #1976D2;
+            background-color: #8CA6D9;
         }
+
         .note {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 4px;
-            color: #856404;
+            padding: 15px 16px;
+            background-color: #ffffff;
+            border: 1px solid #e9e9e7;
+            border-radius: 2px;
+            color: #6e6e6e;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 0;
+            border: 1px solid #e9e9e7;
+            border-bottom: none;
+            background-color: #f7f6f3;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 6px 12px;
+            text-decoration: none;
+            color: #9b9a97;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            margin-top: 0;
+        }
+
+        .tab-item:hover {
+            color: #6e6e6e;
+            background-color: #f0efed;
+        }
+
+        .tab-item.active {
+            color: #37352f;
+            background-color: #ffffff;
+            border: 2px solid #e9e9e7;
+            border-bottom-color: transparent;
+            position: relative;
+            margin-top: -12px;
+            padding-top: 18px;
+            margin-bottom: -2px;
+            z-index: 2;
+        }
+
+        .content-wrapper {
+            background-color: #ffffff;
+            border: 1px solid #e9e9e7;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 24px 16px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 12px 60px;
+            }
+            h1 {
+                font-size: 28px;
+                margin-bottom: 30px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>亚马逊关键词搜索控制面板</h1>
-
-        <div class="script-item">
-            <h2>1. 定时自动运行脚本 - amazon_search_mosaic_kits.py</h2>
-            <div class="description">
-                <strong>功能：</strong> 按照配置自动搜索，找到两个目标ASIN (<code>B0DDDWWJBC</code> 和 <code>B0CWZ2Z5TS</code>)，搜索完成后自动发送日志和截图给你。<br>
-                当前搜索关键词已经配置为：<code>mosaic kits for adults</code>
-            </div>
-            <button onclick="runScript('amazon_search_mosaic_kits.py')">立即运行</button>
+        <div class="tabs">
+            <a href="/static/notion-style-todo.html" class="tab-item">Todo List</a>
+            <a href="/static/amazon_search_control.html" class="tab-item active">Amazon Search</a>
+        </div>
+        <div class="content-wrapper">
+        <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Amazon Keyword Search Control Panel</h1>
+        <div class="version-info">
+            v1.1.0
         </div>
 
         <div class="script-item">
-            <h2>2. 手动单个搜索 - amazon_search_asin_screenshot.py</h2>
-            <div class="description">
-                <strong>功能：</strong> 自定义输入搜索关键词和目标ASIN，自动搜索找到位置后截图保存。
+            <h2 contenteditable="true" style="cursor: text;">1. Auto-run Script - amazon_search_mosaic_kits.py</h2>
+            <div class="description" contenteditable="true" style="cursor: text;">
+                <strong>Function:</strong> Auto-search based on configuration, find target ASINs (<code>B0DDDWWJBC</code> & <code>B0CWZ2Z5TS</code>), send logs and screenshots to you after completion.<br>
+                Current search keyword configured as: <code>mosaic kits for adults</code>
             </div>
-            <div class="input-group">
-                <label for="keyword">搜索关键词：</label>
-                <input type="text" id="keyword" placeholder="例如: mosaic kits for adults">
-            </div>
-            <div class="input-group">
-                <label for="asin">目标ASIN：</label>
-                <input type="text" id="asin" placeholder="例如: B0DDDWWJBC">
-            </div>
-            <button onclick="runManualSearch()">运行搜索</button>
+            <button onclick="runScript('amazon_search_mosaic_kits.py')">Run Now</button>
         </div>
 
         <div class="script-item">
-            <h2>3. 逐页全截图 - search_each_page_screenshot.py</h2>
-            <div class="description">
-                <strong>功能：</strong> 搜索指定关键词，搜索1-5页，<strong>每一页都保存截图</strong>，即使没找到目标ASIN也保存所有页面截图。
+            <h2 contenteditable="true" style="cursor: text;">2. Manual Single Search - amazon_search_asin_screenshot.py</h2>
+            <div class="description" contenteditable="true" style="cursor: text;">
+                <strong>Function:</strong> Custom keyword & target ASIN, auto-search and take screenshot when ASIN found.
             </div>
             <div class="input-group">
-                <label for="keyword_full">搜索关键词：</label>
-                <input type="text" id="keyword_full" placeholder="例如: mosaic beginner">
+                <label for="keyword">Search Keyword:</label>
+                <input type="text" id="keyword" placeholder="e.g. mosaic kits for adults">
             </div>
             <div class="input-group">
-                <label for="asin_full">目标ASIN：</label>
-                <input type="text" id="asin_full" placeholder="例如: B0DDDWWJBC">
+                <label for="asin">Target ASIN:</label>
+                <input type="text" id="asin" placeholder="e.g. B0DDDWWJBC">
             </div>
-            <button onclick="runFullPageScreenshot()">运行逐页全截图</button>
+            <button onclick="runManualSearch()">Run Search</button>
         </div>
 
-        <div class="note">
-            <strong>使用说明：</strong><br>
-            1. 在对应区块填写好参数（关键词 / ASIN）<br>
-            2. 把你要运行哪个脚本告诉我（或者直接截图网页）<br>
-            3. 我会在服务器后台帮你运行脚本，运行结果和截图会自动发送到你的飞书聊天窗口 ✅
+        <div class="script-item">
+            <h2 contenteditable="true" style="cursor: text;">3. Full Page Screenshot - search_each_page_screenshot.py</h2>
+            <div class="description" contenteditable="true" style="cursor: text;">
+                <strong>Function:</strong> Search pages 1-5 for specified keyword, <strong>save screenshot for every page</strong>, all page screenshots will be saved even if target ASIN not found.
+            </div>
+            <div class="input-group">
+                <label for="keyword_full">Search Keyword:</label>
+                <input type="text" id="keyword_full" placeholder="e.g. mosaic beginner">
+            </div>
+            <div class="input-group">
+                <label for="asin_full">Target ASIN:</label>
+                <input type="text" id="asin_full" placeholder="e.g. B0DDDWWJBC">
+            </div>
+            <button onclick="runFullPageScreenshot()">Start Full Screenshot</button>
+        </div>
+
+        <div class="note" contenteditable="true" style="cursor: text;">
+            <strong>Instructions:</strong><br>
+            1. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
+            2. Click the run button to execute the script<br>
+            3. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
         </div>
     </div>
 
     <script>
+        const API_BASE = '/api';
         async function runScript(scriptName) {
             if (scriptName === 'amazon_search_mosaic_kits.py') {
                 try {
@@ -145,10 +259,10 @@
                     if (result.success) {
                         alert(result.message);
                     } else {
-                        alert('运行失败: ' + result.error);
+                        alert('Run failed: ' + result.error);
                     }
                 } catch (error) {
-                    alert('请求失败: ' + error.message);
+                    alert('Request failed: ' + error.message);
                 }
             }
         }
@@ -157,7 +271,7 @@
             const keyword = document.getElementById('keyword').value;
             const asin = document.getElementById('asin').value;
             if (!keyword || !asin) {
-                alert('请填写搜索关键词和目标ASIN！');
+                alert('Please fill in search keyword and target ASIN!');
                 return;
             }
             try {
@@ -172,10 +286,10 @@
                 if (result.success) {
                     alert(result.message);
                 } else {
-                    alert('运行失败: ' + result.error);
+                    alert('Run failed: ' + result.error);
                 }
             } catch (error) {
-                alert('请求失败: ' + error.message);
+                alert('Request failed: ' + error.message);
             }
         }
 
@@ -183,7 +297,7 @@
             const keyword = document.getElementById('keyword_full').value;
             const asin = document.getElementById('asin_full').value;
             if (!keyword || !asin) {
-                alert('请填写搜索关键词和目标ASIN！');
+                alert('Please fill in search keyword and target ASIN!');
                 return;
             }
             try {
@@ -198,12 +312,110 @@
                 if (result.success) {
                     alert(result.message);
                 } else {
-                    alert('运行失败: ' + result.error);
+                    alert('Run failed: ' + result.error);
                 }
             } catch (error) {
-                alert('请求失败: ' + error.message);
+                alert('Request failed: ' + error.message);
             }
         }
+// ==================== 页面标题保存功能 ====================
+const pageTitleEl = document.getElementById('pageTitle');
+
+// 页面加载时读取保存的标题
+async function loadPageTitle() {
+    try {
+        const response = await fetch(`${API_BASE}/page-title-amazon`);
+        const data = await response.json();
+        if (data.success && data.title) {
+            pageTitleEl.textContent = data.title;
+        }
+    } catch (error) {
+        console.error('加载标题失败', error);
+        // 失败了用默认标题
+    }
+}
+
+// 标题修改时自动保存到后端
+pageTitleEl.addEventListener('input', async () => {
+    const currentTitle = pageTitleEl.textContent.trim();
+    try {
+        await fetch(`${API_BASE}/page-title-amazon`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: currentTitle })
+        });
+    } catch (error) {
+        console.error('保存标题失败', error);
+    }
+});
+
+// 加载标题
+loadPageTitle();
+
+// ==================== 自动保存所有可编辑内容 ====================
+// DOM已经准备好，直接绑定事件
+const editableElements = document.querySelectorAll('[contenteditable="true"]');
+editableElements.forEach(el => {
+    // 生成唯一key
+    const key = 'content_' + generateId(el);
+    el.dataset.saveKey = key;
+    
+    // 加载保存的内容
+    loadEditableContent(el);
+    
+    // 输入时自动保存
+    el.addEventListener('input', () => {
+        saveEditableContent(el);
+    });
+});
+
+// 生成元素唯一ID
+function generateId(el) {
+    let id = el.tagName.toLowerCase();
+    if (el.className) {
+        id += '_' + el.className.replace(/\s+/g, '_');
+    }
+    // 获取所有同类元素，找到当前元素的索引
+    const all = Array.from(document.querySelectorAll('[contenteditable="true"]'));
+    const index = all.indexOf(el);
+    id += '_' + index;
+    return id;
+}
+
+// 加载保存的内容
+async function loadEditableContent(el) {
+    const key = el.dataset.saveKey;
+    try {
+        const response = await fetch(`${API_BASE}/editable-content?key=${key}`);
+        const data = await response.json();
+        if (data.success && data.content !== null) {
+            el.innerHTML = data.content;
+        }
+    } catch (error) {
+        console.error('加载内容失败', key, error);
+    }
+}
+
+// 保存内容
+async function saveEditableContent(el) {
+    const key = el.dataset.saveKey;
+    const content = el.innerHTML;
+    try {
+        await fetch(`${API_BASE}/editable-content`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ key, content })
+        });
+    } catch (error) {
+        console.error('保存内容失败', key, error);
+    }
+}
     </script>
+        </div>
+    </div>
 </body>
 </html>

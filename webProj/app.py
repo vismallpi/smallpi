@@ -225,7 +225,7 @@ def recognize_speech():
 @app.route('/')
 @app.route('/notion-style-todo.html')
 def index():
-    return open('notion-style-todo.html', 'r', encoding='utf-8').read()
+    return app.send_static_file('notion-style-todo.html')
 
 # 商务英语词汇背单词网站
 @app.route('/vocab')
@@ -281,6 +281,96 @@ def save_page_title():
     cursor.execute('''
         REPLACE INTO page_config (key, value) VALUES (?, ?)
     ''', ('page_title', title))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True})
+
+@app.route('/api/page-title-amazon', methods=['GET'])
+def get_page_title_amazon():
+    conn = sqlite3.connect('tasks.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS page_config (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('SELECT value FROM page_config WHERE key = ?', ('page_title_amazon',))
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result:
+        return jsonify({'success': True, 'title': result[0]})
+    else:
+        return jsonify({'success': True, 'title': 'Amazon Keyword Search Control Panel'})
+
+@app.route('/api/page-title-amazon', methods=['POST'])
+def save_page_title_amazon():
+    data = request.get_json()
+    title = data.get('title', 'Amazon Keyword Search Control Panel')
+    
+    conn = sqlite3.connect('tasks.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS page_config (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+    # 插入或替换
+    cursor.execute('''
+        REPLACE INTO page_config (key, value) VALUES (?, ?)
+    ''', ('page_title_amazon', title))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True})
+
+# 通用可编辑内容保存/读取API
+@app.route('/api/editable-content', methods=['GET'])
+def get_editable_content():
+    key = request.args.get('key')
+    if not key:
+        return jsonify({'success': False, 'error': 'Missing key'})
+    
+    conn = sqlite3.connect('tasks.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS editable_contents (
+            key TEXT PRIMARY KEY,
+            content TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('SELECT content FROM editable_contents WHERE key = ?', (key,))
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result:
+        return jsonify({'success': True, 'content': result[0]})
+    else:
+        return jsonify({'success': True, 'content': None})
+
+@app.route('/api/editable-content', methods=['POST'])
+def save_editable_content():
+    data = request.get_json()
+    key = data.get('key')
+    content = data.get('content')
+    
+    if not key:
+        return jsonify({'success': False, 'error': 'Missing key'})
+    
+    conn = sqlite3.connect('tasks.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS editable_contents (
+            key TEXT PRIMARY KEY,
+            content TEXT NOT NULL
+        )
+    ''')
+    cursor.execute('''
+        REPLACE INTO editable_contents (key, content) VALUES (?, ?)
+    ''', (key, content))
     conn.commit()
     conn.close()
     

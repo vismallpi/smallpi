@@ -29,6 +29,10 @@
             padding: 30px 16px 60px;
         }
 
+        .tabs {
+            margin-bottom: 36px;
+        }
+
         h1 {
             font-size: 32px;
             font-weight: 700;
@@ -448,6 +452,56 @@
             }
         }
 
+        .tabs {
+            display: flex;
+            margin-bottom: 0;
+            border: 1px solid #e9e9e7;
+            border-bottom: none;
+            background-color: #f7f6f3;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 6px 12px;
+            text-decoration: none;
+            color: #9b9a97;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            margin-top: 0;
+        }
+
+        .tab-item:hover {
+            color: #6e6e6e;
+            background-color: #f0efed;
+        }
+
+        .tab-item.active {
+            color: #37352f;
+            background-color: #ffffff;
+            border: 2px solid #e9e9e7;
+            border-bottom-color: transparent;
+            position: relative;
+            margin-top: -12px;
+            padding-top: 18px;
+            margin-bottom: -2px;
+            z-index: 2;
+        }
+
+        .content-wrapper {
+            background-color: #ffffff;
+            border: 1px solid #e9e9e7;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 24px 16px;
+        }
+
         .empty-state {
             text-align: center;
             color: #9b9a97;
@@ -476,7 +530,13 @@
 </head>
 <body>
     <div class="container">
-        <h1 id="pageTitle" contenteditable="true" style="cursor: text;">Tasks</h1>
+        <div class="tabs">
+            <a href="/static/notion-style-todo.html" class="tab-item active">Todo List</a>
+            <a href="/static/amazon_search_control.html" class="tab-item">Amazon Search</a>
+        </div>
+        <div class="content-wrapper">
+        
+        <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Tasks</h1>
         <div class="version-info">
             v3.8.0
         </div>
@@ -1230,5 +1290,7 @@ pageTitleEl.addEventListener('input', async () => {
 // 加载标题
 loadPageTitle();
 </script>
+        </div>
+    </div>
 </body>
 </html>
