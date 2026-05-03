@@ -10,6 +10,8 @@ Steps:
 
 import time
 import os
+import pytz
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -29,18 +31,46 @@ MAX_RETRIES = 1
 FEISHU_RECEIVER_ID = "ou_a331505193726d421fb0108a11bc6197"
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
-# Send log to Feishu dialog
-def send_log_to_feishu(log_text):
-    """Send log message to specified Feishu user via OpenClaw message API"""
-    import os
-    import sys
-    # We can call OpenClaw's message tool by executing command
+# Save original print before overriding
+original_print = print
+
+# Create log file with timestamp - Daily Auto Search
+RUN_ID = int(time.time())
+LOG_FILE = f"/root/.openclaw/workspace/Amazon/logs/{RUN_ID}_daily_search.log"
+SCREENSHOT_DIR = f"/root/.openclaw/workspace/Amazon/logs/{RUN_ID}_daily_screenshots"
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+
+# Send log to Feishu real-time + write to file with timestamp
+def send_log(log_text):
+    """Send log message to Feishu in real-time + write to log file"""
+    from datetime import datetime
+    beijing_tz = pytz.timezone('Asia/Shanghai')
+    now = datetime.now(beijing_tz).strftime('%Y-%m-%d %H:%M:%S')
+    log_line = f"[{now}] {log_text}"
+    
     try:
+        # Write to log file
+        with open(LOG_FILE, 'a', encoding='utf-8') as f:
+            f.write(log_line + '\n')
+        # Send to Feishu
         cmd = f'''openclaw message send --channel feishu --target {FEISHU_RECEIVER_ID} --message "{log_text.replace('"', '\\"')}"'''
         os.system(cmd)
-        print(f"[LOG SENT] {log_text}")
+        original_print(f"[LOG SENT + FILE] {log_text[:50]}...")
     except Exception as e:
-        print(f"[LOG FAILED] {log_text}\nError: {e}")
+        original_print(f"[LOG FAILED] {log_text}\nError: {e}")
+
+# Override print to send to Feishu real-time + write to file
+def new_print(*args, **kwargs):
+    # Always print to console (original)
+    original_print(*args, **kwargs)
+    # Convert args to string
+    msg = " ".join(str(arg) for arg in args)
+    if msg.strip():
+        # Send to Feishu and write to file
+        send_log(msg)
+
+print = new_print
 
 # Headers to mimic real browser
 HEADERS = {
@@ -54,14 +84,10 @@ def search_and_find_asins():
     found_hrefs = []
     page = 1
     
-    log_text = "=== [Phase 1] Searching with requests (lightweight) ===\n"
-    print(log_text)
-    send_log_to_feishu(log_text)
+    print("=== [Phase 1] Searching with requests (lightweight) ===\n")
     
     while len(found_hrefs) < len(TARGET_ASINS):
-        log_text = f"Searching page {page}..."
-        print(log_text)
-        send_log_to_feishu(log_text)
+        print(f"Searching page {page}...")
         
         params = {
             'k': SEARCH_KEYWORD,
@@ -76,19 +102,13 @@ def search_and_find_asins():
                 success = True
                 break
             except Exception as e:
-                log_text = f"  Attempt {retry + 1}/{MAX_RETRIES} failed: {type(e).__name__}: {e}"
-                print(log_text)
-                send_log_to_feishu(log_text)
+                print(f"  Attempt {retry + 1}/{MAX_RETRIES} failed: {type(e).__name__}: {e}")
                 if retry < MAX_RETRIES - 1:
-                    log_text = f"  Waiting 10s before retry...\n"
-                    print(log_text)
-                    send_log_to_feishu(log_text)
+                    print(f"  Waiting 10s before retry...\n")
                     time.sleep(10)
         
         if not success:
-            log_text = f"❌ Failed to load page {page} after {MAX_RETRIES} retries\n"
-            print(log_text)
-            send_log_to_feishu(log_text)
+            print(f"❌ Failed to load page {page} after {MAX_RETRIES} retries\n")
             break
         
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -102,12 +122,8 @@ def search_and_find_asins():
                     if asin in full_href:
                         already_found = any(f[0] == asin for f in found_hrefs)
                         if not already_found:
-                            log_text = f"  ✅ Found ASIN: {asin} on page {page}"
-                            print(log_text)
-                            send_log_to_feishu(log_text)
-                            log_text = f"      Link: {full_href}\n"
-                            print(log_text)
-                            send_log_to_feishu(log_text)
+                            print(f"  ✅ Found ASIN: {asin} on page {page}")
+                            print(f"      Link: {full_href}\n")
                             found_hrefs.append((asin, full_href))
         
         if len(found_hrefs) == len(TARGET_ASINS):
@@ -116,17 +132,13 @@ def search_and_find_asins():
         # Check if there's next page by looking for "Next" button
         next_button = soup.select_one('a.s-pagination-next')
         if not next_button or 's-pagination-disabled' in next_button.get('class', []):
-            log_text = "❌ No more pages available\n"
-            print(log_text)
-            send_log_to_feishu(log_text)
+            print("❌ No more pages available\n")
             break
         
         page += 1
         time.sleep(10)
     
-    log_text = f"[Phase 1 completed] Found {len(found_hrefs)}/{len(TARGET_ASINS)} target ASINs\n"
-    print(log_text)
-    send_log_to_feishu(log_text)
+    print(f"[Phase 1 completed] Found {len(found_hrefs)}/{len(TARGET_ASINS)} target ASINs\n")
     return found_hrefs
 
 def send_screenshot_to_feishu(screenshot_path, asin):
@@ -137,27 +149,23 @@ def send_screenshot_to_feishu(screenshot_path, asin):
         # os.system returns exit_code * 256, so 0 means success
         return_code = os.system(cmd)
         if return_code == 0:
-            send_log_to_feishu(f"  ✅ Screenshot {asin} sent to Feishu")
+            print(f"  ✅ Screenshot {asin} sent to Feishu")
             return True
         else:
             exit_code = return_code >> 8
-            send_log_to_feishu(f"  ❌ Failed to send screenshot {asin}, exit code: {exit_code}")
+            print(f"  ❌ Failed to send screenshot {asin}, exit code: {exit_code}")
             return False
     except Exception as e:
-        send_log_to_feishu(f"  ❌ Failed to send screenshot {asin}: {type(e).__name__}: {e}")
+        print(f"  ❌ Failed to send screenshot {asin}: {type(e).__name__}: {e}")
         return False
 
 def take_screenshots(found_hrefs):
     """Use selenium only for taking screenshots - only open product pages we already found"""
     if not found_hrefs:
-        log_text = "No ASINs found, skipping screenshot phase"
-        print(log_text)
-        send_log_to_feishu(log_text)
+        print("No ASINs found, skipping screenshot phase")
         return 0
     
-    log_text = "=== [Phase 2] Taking screenshots with selenium ===\n"
-    print(log_text)
-    send_log_to_feishu(log_text)
+    print("=== [Phase 2] Taking screenshots with selenium ===\n")
     
     # Chrome options - enable images for correct page rendering
     chrome_options = Options()
@@ -179,14 +187,10 @@ def take_screenshots(found_hrefs):
     success_count = 0
     from selenium.webdriver.common.by import By
     for (asin, href) in found_hrefs:
-        log_text = f"Processing {asin}..."
-        print(log_text)
-        send_log_to_feishu(log_text)
+        print(f"Processing {asin}...")
         for retry in range(MAX_RETRIES):
             try:
-                log_text = f"  Opening {asin}"
-                print(log_text)
-                send_log_to_feishu(log_text)
+                print(f"  Opening {asin}")
                 driver.get(href)
                 time.sleep(30)  # Wait for page load
                 
@@ -195,9 +199,7 @@ def take_screenshots(found_hrefs):
                 try:
                     buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Continue shopping')]")
                     if buttons:
-                        log_text = f"  🔘 Found 'Continue shopping' button, clicking..."
-                        print(log_text)
-                        send_log_to_feishu(log_text)
+                        print(f"  🔘 Found 'Continue shopping' button, clicking...")
                         buttons[0].click()
                         time.sleep(15)  # Wait for page reload after click
                 except Exception as e:
@@ -207,9 +209,7 @@ def take_screenshots(found_hrefs):
                 try:
                     buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Try again')]")
                     if buttons:
-                        log_text = f"  🔘 Found 'Try again' button (robot check), clicking..."
-                        print(log_text)
-                        send_log_to_feishu(log_text)
+                        print(f"  🔘 Found 'Try again' button (robot check), clicking...")
                         buttons[0].click()
                         time.sleep(15)  # Wait for page reload after click
                 except Exception as e:
@@ -219,9 +219,7 @@ def take_screenshots(found_hrefs):
                 try:
                     buttons = driver.find_elements(By.XPATH, "//*[contains(text(), 'Continue')]")
                     if buttons:
-                        log_text = f"  🔘 Found 'Continue' button, clicking..."
-                        print(log_text)
-                        send_log_to_feishu(log_text)
+                        print(f"  🔘 Found 'Continue' button, clicking...")
                         buttons[0].click()
                         time.sleep(15)  # Wait for page reload after click
                 except Exception as e:
@@ -237,9 +235,7 @@ def take_screenshots(found_hrefs):
                 # Take screenshot
                 screenshot_path = os.path.join(SCREENSHOT_DIR, f"{asin}_screenshot.png")
                 driver.save_screenshot(screenshot_path)
-                log_text = f"  ✅ Screenshot saved: {screenshot_path}"
-                print(log_text)
-                send_log_to_feishu(log_text)
+                print(f"  ✅ Screenshot saved: {screenshot_path}")
                 
                 # Send screenshot to Feishu
                 send_screenshot_to_feishu(screenshot_path, asin)
@@ -247,27 +243,15 @@ def take_screenshots(found_hrefs):
                 success_count += 1
                 break
             except Exception as e:
-                log_text = f"  ❌ Attempt failed: {type(e).__name__}: {e}\n"
-                print(log_text)
-                send_log_to_feishu(log_text)
+                print(f"  ❌ Attempt failed: {type(e).__name__}: {e}\n")
                 if retry < MAX_RETRIES - 1:
-                    log_text = "  Waiting 15s before retry...\n"
-                    print(log_text)
-                    send_log_to_feishu(log_text)
+                    print("  Waiting 15s before retry...\n")
                     time.sleep(15)
     
-    log_text = "\n=== [All completed] ==="
-    print(log_text)
-    send_log_to_feishu(log_text)
-    log_text = f"Total ASINs found: {len(found_hrefs)}/{len(TARGET_ASINS)}"
-    print(log_text)
-    send_log_to_feishu(log_text)
-    log_text = f"Screenshots successful: {success_count}/{len(found_hrefs)}"
-    print(log_text)
-    send_log_to_feishu(log_text)
-    log_text = f"Screenshots saved to: {SCREENSHOT_DIR}"
-    print(log_text)
-    send_log_to_feishu(log_text)
+    print("\n=== [All completed] ===")
+    print(f"Total ASINs found: {len(found_hrefs)}/{len(TARGET_ASINS)}")
+    print(f"Screenshots successful: {success_count}/{len(found_hrefs)}")
+    print(f"Screenshots saved to: {SCREENSHOT_DIR}")
     
     driver.quit()
     return success_count

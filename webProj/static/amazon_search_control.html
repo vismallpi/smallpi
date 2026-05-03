@@ -103,6 +103,13 @@
             background-color: #fafafa;
         }
 
+        .button-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
         button {
             padding: 12px 20px;
             background-color: #A9C5ED;
@@ -118,6 +125,16 @@
 
         button:hover {
             background-color: #8CA6D9;
+        }
+
+        button.secondary {
+            background-color: #f0efed;
+            border-color: #d9d9d9;
+            color: #6e6e6e;
+        }
+
+        button.secondary:hover {
+            background-color: #e9e9e7;
         }
 
         .note {
@@ -180,6 +197,118 @@
             padding: 24px 16px;
         }
 
+        /* Log Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e9e9e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            color: #9b9a97;
+        }
+
+        .modal-close:hover {
+            color: #37352f;
+        }
+
+        .modal-body {
+            padding: 16px;
+            max-height: calc(80vh - 80px);
+            overflow-y: auto;
+        }
+
+        #log-content {
+            background-color: #f7f6f3;
+            padding: 12px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 40vh;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        #screenshot-gallery {
+            margin-top: 16px;
+        }
+
+        #screenshot-gallery h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #37352f;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .screenshot-item {
+            border: 1px solid #e9e9e7;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .screenshot-item a {
+            display: block;
+            padding: 5px;
+            text-align: center;
+            font-size: 12px;
+            color: #6e6e6e;
+            text-decoration: none;
+        }
+
         /* 移动端适配 */
         @media (max-width: 600px) {
             .container {
@@ -188,6 +317,12 @@
             h1 {
                 font-size: 28px;
                 margin-bottom: 30px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
             }
         }
     </style>
@@ -207,8 +342,13 @@ function runScript(scriptName) {
                 return response.json();
             })
             .then(result => {
-                if (result.success) alert(result.message);
-                else alert('Run failed: ' + result.error);
+                if (result.success) {
+                    alert(result.message);
+                    // After triggering run, the next log will be this daily run, so clear cache to load latest from server
+                    lastLog.auto = null;
+                } else {
+                    alert('Run failed: ' + result.error);
+                }
             })
             .catch(error => {
                 alert('Request failed: ' + error.message);
@@ -250,8 +390,13 @@ function runManualSearch() {
             return response.json();
         })
         .then(result => {
-            if (result.success) alert(result.message);
-            else alert('Run failed: ' + result.error);
+            if (result.success) {
+                alert(result.message);
+                // After triggering run, the next log will be this manual run, so clear cache to load latest from server
+                lastLog.manual = null;
+            } else {
+                alert('Run failed: ' + result.error);
+            }
         })
         .catch(error => {
             alert('Request failed: ' + error.message);
@@ -281,8 +426,13 @@ function runFullPageScreenshot() {
             return response.json();
         })
         .then(result => {
-            if (result.success) alert(result.message);
-            else alert('Run failed: ' + result.error);
+            if (result.success) {
+                alert(result.message);
+                // After triggering run, the next log will be this fullpage run, so clear cache to load latest from server
+                lastLog.fullpage = null;
+            } else {
+                alert('Run failed: ' + result.error);
+            }
         })
         .catch(error => {
             alert('Request failed: ' + error.message);
@@ -292,27 +442,150 @@ function runFullPageScreenshot() {
     }
 }
 
+// ========== Log Viewer ==========
+// Store last log filename for each section
+let lastLog = {
+    'manual': null,
+    'auto': null,
+    'fullpage': null
+};
+
+function openLogModal(section) {
+    const modal = document.getElementById('log-modal');
+    modal.style.display = 'block';
+    
+    document.getElementById('log-content').textContent = 'Loading...';
+    document.getElementById('screenshot-gallery').innerHTML = '';
+    
+    if (section && lastLog[section]) {
+        // Load last log for this section
+        loadLogContent(lastLog[section]);
+        document.getElementById('modal-title').textContent = `Latest Log - ${section} search`;
+    } else {
+        // Load latest log for this section type
+        fetch(`${API_BASE}/amazon/logs`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.logs.length > 0) {
+                // Filter by section type
+                let suffix;
+                if (section === 'manual') suffix = '_manual_search.log';
+                if (section === 'auto') suffix = '_daily_search.log';
+                if (section === 'fullpage') suffix = '_fullpage_search.log';
+                let filtered = data.logs.filter(l => l.filename.endsWith(suffix));
+                if (filtered.length > 0) {
+                    const latest = filtered[0];
+                    lastLog[section] = latest.filename;
+                    loadLogContent(latest.filename);
+                    document.getElementById('modal-title').textContent = `Latest Log - ${section} search (${latest.mtime_str})`;
+                } else {
+                    document.getElementById('log-content').textContent = `No log files found for ${section} search.`;
+                }
+            } else {
+                document.getElementById('log-content').textContent = 'No log files found.';
+            }
+        })
+        .catch(error => {
+            document.getElementById('log-content').textContent = 'Failed to load log list: ' + error.message;
+        });
+    }
+}
+
+function closeLogModal() {
+    const modal = document.getElementById('log-modal');
+    modal.style.display = 'none';
+}
+
+function loadLatestLog() {
+    document.getElementById('log-content').textContent = 'Loading...';
+    fetch(`${API_BASE}/amazon/logs`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.logs.length > 0) {
+            // Load latest log
+            const latest = data.logs[0];
+            loadLogContent(latest.filename);
+            document.getElementById('modal-title').textContent = `Latest Log - ${latest.mtime_str}`;
+        } else {
+            document.getElementById('log-content').textContent = 'No log files found.';
+        }
+    })
+    .catch(error => {
+        document.getElementById('log-content').textContent = 'Failed to load log list: ' + error.message;
+    });
+}
+
+function loadLogContent(filename) {
+    fetch(`${API_BASE}/amazon/log-content?filename=${encodeURIComponent(filename)}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const content = data.content || '(empty)';
+            document.getElementById('log-content').textContent = content;
+            
+            // Extract screenshot paths from log and display them
+            const gallery = document.getElementById('screenshot-gallery');
+            gallery.innerHTML = '<h4>Screenshots:</h4><div class="screenshot-grid"></div>';
+            const grid = gallery.querySelector('.screenshot-grid');
+            
+            // Extract all lines containing "Screenshot saved: /..."
+            const lines = content.split('\n');
+            const screenshotPaths = [];
+            for (const line of lines) {
+                const match = line.match(/Screenshot saved: (.+\.png)/);
+                if (match) {
+                    screenshotPaths.push(match[1]);
+                }
+            }
+            
+            if (screenshotPaths.length > 0) {
+                screenshotPaths.forEach(path => {
+                    const item = document.createElement('div');
+                    item.className = 'screenshot-item';
+                    const filename = path.split('/').pop();
+                    item.innerHTML = `
+                        <img src="${API_BASE}/amazon/screenshot?path=${encodeURIComponent(path)}" alt="${filename}" loading="lazy">
+                        <a href="${API_BASE}/amazon/screenshot?path=${encodeURIComponent(path)}" target="_blank">${filename}</a>
+                    `;
+                    grid.appendChild(item);
+                });
+            } else {
+                gallery.innerHTML = '<h4>Screenshots:</h4><p style="margin: 0; padding-left: 4px; color: #9b9a97;">No screenshots saved in this run yet</p>';
+            }
+        } else {
+            document.getElementById('log-content').textContent = 'Failed to load: ' + (data.error || 'Unknown error');
+            document.getElementById('screenshot-gallery').innerHTML = '';
+        }
+    })
+    .catch(error => {
+        document.getElementById('log-content').textContent = 'Failed to load: ' + error.message;
+        document.getElementById('screenshot-gallery').innerHTML = '';
+    });
+}
+
+// Click outside to close modal
+window.onclick = function(event) {
+    const modal = document.getElementById('log-modal');
+    if (event.target == modal) {
+        closeLogModal();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, binding events');
     
-    // 绑定按钮点击事件
-    document.getElementById('btn-run-manual').addEventListener('click', function() {
-        console.log('Button clicked');
-        runManualSearch();
-    });
-    
-    document.getElementById('btn-run-auto').addEventListener('click', function() {
-        runScript('amazon_search_mosaic_kits.py');
-    });
-    
-    document.getElementById('btn-run-full').addEventListener('click', function() {
-        runFullPageScreenshot();
+    // Binding already done by onclick + direct in HTML
+    // Close on ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeLogModal();
+        }
     });
     
     // 加载页面标题
     loadPageTitle();
     
-    // 绑定可编辑内容
+    // 绑定可编辑内容保存
     const editableElements = document.querySelectorAll('[contenteditable="true"]');
     editableElements.forEach(el => {
         const key = 'content_' + generateId(el);
@@ -366,31 +639,31 @@ function generateId(el) {
     return id;
 }
 
-function loadEditableContent(el) {
+async function loadEditableContent(el) {
     const key = el.dataset.saveKey;
-    fetch(`${API_BASE}/editable-content?key=${key}`)
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const response = await fetch(`${API_BASE}/editable-content?key=${key}`);
+        const data = await response.json();
         if (data.success && data.content !== null) {
             el.innerHTML = data.content;
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('加载内容失败', key, error);
-    });
+    }
 }
 
-function saveEditableContent(el) {
+async function saveEditableContent(el) {
     const key = el.dataset.saveKey;
     const content = el.innerHTML;
-    fetch(`${API_BASE}/editable-content`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key, content })
-    })
-    .catch(error => {
+    try {
+        await fetch(`${API_BASE}/editable-content`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key, content })
+        });
+    } catch (error) {
         console.error('保存内容失败', key, error);
-    });
+    }
 }
 </script>
 </head>
@@ -403,7 +676,7 @@ function saveEditableContent(el) {
         <div class="content-wrapper">
             <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Amazon Keyword Search Control Panel</h1>
             <div class="version-info">
-                v1.4.6 - Fixed infinite recursion bug in real-time logging, added parameters print on entry
+                v1.5.4 - Each section filters logs by script type, filenames clearly show which script it belongs to
             </div>
 
             <div class="script-item">
@@ -439,7 +712,10 @@ function saveEditableContent(el) {
                         <option value="B0CWZ2Z5TS">B0CWZ2Z5TS (OLD)</option>
                     </select>
                 </div>
-                <button id="btn-run-manual" onclick="runManualSearch()">Run Search</button>
+                <div class="button-group">
+                    <button onclick="runManualSearch(); lastLog.manual = null; openLogModal('manual')">Run Search</button>
+                    <button class="secondary" onclick="openLogModal('manual')">View Latest Log</button>
+                </div>
             </div>
 
             <div class="script-item">
@@ -448,7 +724,10 @@ function saveEditableContent(el) {
                     <strong>Function:</strong> Auto-search based on fixed configuration (daily monitoring task), find both target ASINs (<code>B0DDDWWJBC (NEW)</code> & <code>B0CWZ2Z5TS (OLD)</code>), send logs and screenshots to you after completion.<br>
                     This is the daily scheduled task that runs automatically twice a day.
                 </div>
-                <button id="btn-run-auto">Run Now (Manual Trigger)</button>
+                <div class="button-group">
+                    <button onclick="runScript('amazon_search_mosaic_kits.py'); lastLog.auto = null; openLogModal('auto')">Run Now (Manual Trigger)</button>
+                    <button class="secondary" onclick="openLogModal('auto')">View Latest Log</button>
+                </div>
             </div>
 
             <div class="script-item">
@@ -468,14 +747,32 @@ function saveEditableContent(el) {
                         <option value="B0CWZ2Z5TS">B0CWZ2Z5TS (OLD)</option>
                     </select>
                 </div>
-                <button id="btn-run-full">Start Full Screenshot</button>
+                <div class="button-group">
+                    <button onclick="runFullPageScreenshot(); lastLog.fullpage = null; openLogModal('fullpage')">Start Full Screenshot</button>
+                    <button class="secondary" onclick="openLogModal('fullpage')">View Latest Log</button>
+                </div>
             </div>
 
             <div class="note" contenteditable="true" style="cursor: text;">
                 <strong>Instructions:</strong><br>
                 1. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
                 2. Click the run button to execute the script<br>
-                3. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
+                3. Click "View Latest Log" to open real-time log viewer<br>
+                4. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Modal -->
+    <div id="log-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Latest Run Log</h3>
+                <button class="modal-close" onclick="closeLogModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="log-content">Loading...</pre>
+                <div id="screenshot-gallery"></div>
             </div>
         </div>
     </div>

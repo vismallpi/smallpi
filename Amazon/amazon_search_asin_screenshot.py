@@ -8,6 +8,8 @@ All logs are sent real-time to Feishu dialog
 import time
 import os
 import sys
+import pytz
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -31,31 +33,44 @@ HEADERS = {
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
-# Send log to Feishu real-time
+# Save original print before overriding
+original_print = print
+
+# Create log file with timestamp - Manual Search
+RUN_ID = int(time.time())
+LOG_FILE = f"/root/.openclaw/workspace/Amazon/logs/{RUN_ID}_manual_search.log"
+SCREENSHOT_DIR = f"/root/.openclaw/workspace/Amazon/logs/{RUN_ID}_manual_screenshots"
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+
+# Send log to Feishu real-time + write to file with timestamp
 def send_log(log_text):
-    """Send log message to Feishu in real-time"""
+    """Send log message to Feishu in real-time + write to log file"""
+    from datetime import datetime
+    beijing_tz = pytz.timezone('Asia/Shanghai')
+    now = datetime.now(beijing_tz).strftime('%Y-%m-%d %H:%M:%S')
+    log_line = f"[{now}] {log_text}"
+    
     try:
+        # Write to log file
+        with open(LOG_FILE, 'a', encoding='utf-8') as f:
+            f.write(log_line + '\n')
+        # Send to Feishu
         cmd = f'''openclaw message send --channel feishu --target {FEISHU_RECEIVER_ID} --message "{log_text.replace('"', '\\"')}"'''
         os.system(cmd)
-        print(f"[LOG SENT] {log_text[:50]}...")
+        original_print(f"[LOG SENT + FILE] {log_text[:50]}...")
     except Exception as e:
-        print(f"[LOG FAILED] {log_text}\nError: {e}")
+        original_print(f"[LOG FAILED] {log_text}\nError: {e}")
 
-# Override print to send to Feishu real-time
-original_print = print
+# Override print to send to Feishu real-time + write to file
 def new_print(*args, **kwargs):
-    # Always print to console
+    # Always print to console (original)
     original_print(*args, **kwargs)
     # Convert args to string
     msg = " ".join(str(arg) for arg in args)
     if msg.strip():
-        # Use original_print for send_log internal, avoid recursion
-        original_print(f"[LOG SENT] {msg[:50]}...")
-        try:
-            cmd = f'''openclaw message send --channel feishu --target {FEISHU_RECEIVER_ID} --message "{msg.replace('"', '\\"')}"'''
-            os.system(cmd)
-        except Exception as e:
-            original_print(f"[LOG FAILED] {msg}\nError: {e}")
+        # Send to Feishu and write to file
+        send_log(msg)
 print = new_print
 
 def search_asin_position(keyword, target_asin):

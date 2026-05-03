@@ -368,6 +368,7 @@ def save_editable_content():
             content TEXT NOT NULL
         )
     ''')
+    # 插入或替换
     cursor.execute('''
         REPLACE INTO editable_contents (key, content) VALUES (?, ?)
     ''', (key, content))
@@ -408,20 +409,10 @@ def run_manual_search():
         return jsonify({'success': False, 'error': '请填写关键词和ASIN'})
     
     try:
-        # 需要修改脚本里的关键词和ASIN，然后运行
-        script_path = "/root/.openclaw/workspace/Amazon/amazon_search_asin_screenshot.py"
-        # 读取脚本，替换关键词和ASIN
-        with open(script_path, 'r') as f:
-            content = f.read()
-        
-        content = content.replace('SEARCH_KEYWORD = "', f'SEARCH_KEYWORD = "{keyword}')
-        content = content.replace('TARGET_ASIN = "', f'TARGET_ASIN = "{asin}')
-        
-        with open(script_path, 'w') as f:
-            f.write(content)
-        
-        # 后台运行
-        cmd = f"cd /root/.openclaw/workspace/Amazon && python3 ./amazon_search_asin_screenshot.py"
+        # 通过命令行参数传递keyword和asin，不需要修改脚本文件
+        # escape quotes for shell
+        keyword_escaped = keyword.replace('"', '\\"')
+        cmd = f"cd /root/.openclaw/workspace/Amazon && python3 ./amazon_search_asin_screenshot.py \"{keyword_escaped}\" {asin}"
         subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         return jsonify({
@@ -445,19 +436,9 @@ def run_fullpage_screenshot():
         return jsonify({'success': False, 'error': '请填写关键词和ASIN'})
     
     try:
-        # 修改脚本里的关键词和ASIN
-        script_path = "/root/.openclaw/workspace/Amazon/search_each_page_screenshot.py"
-        with open(script_path, 'r') as f:
-            content = f.read()
-        
-        content = content.replace('SEARCH_KEYWORD = "', f'SEARCH_KEYWORD = "{keyword}')
-        content = content.replace('TARGET_ASIN = "', f'TARGET_ASIN = "{asin}')
-        
-        with open(script_path, 'w') as f:
-            f.write(content)
-        
-        # 后台运行
-        cmd = f"cd /root/.openclaw/workspace/Amazon && python3 ./search_each_page_screenshot.py"
+        # 通过命令行参数传递keyword和asin，不需要修改脚本文件
+        keyword_escaped = keyword.replace('"', '\\"')
+        cmd = f"cd /root/.openclaw/workspace/Amazon && python3 ./search_each_page_screenshot.py \"{keyword_escaped}\" {asin}"
         subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         return jsonify({
@@ -469,6 +450,63 @@ def run_fullpage_screenshot():
             'success': False,
             'error': str(e)
         })
+
+# ==================== Amazon Log Viewer API ====================
+@app.route('/api/amazon/logs', methods=['GET'])
+def list_amazon_logs():
+    """List all amazon log files sorted by time newest first"""
+    log_dir = "/root/.openclaw/workspace/Amazon/logs"
+    os.makedirs(log_dir, exist_ok=True)
+    files = []
+    for f in os.listdir(log_dir):
+        if f.endswith('.log'):
+            full_path = os.path.join(log_dir, f)
+            mtime = os.path.getmtime(full_path)
+            files.append((-mtime, f, mtime))
+    # Sort by newest first
+    files.sort()
+    result = []
+    for neg_mtime, f, mtime in files[:10]:  # Return latest 10
+        result.append({
+            'filename': f,
+            'mtime': mtime,
+            'mtime_str': datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
+        })
+    return jsonify({'success': True, 'logs': result})
+
+@app.route('/api/amazon/log-content', methods=['GET'])
+def get_amazon_log_content():
+    """Get content of a specific log file"""
+    filename = request.args.get('filename')
+    if not filename:
+        return jsonify({'success': False, 'error': 'Missing filename'})
+    # Security: only allow .log in logs dir
+    if '..' in filename or not filename.endswith('.log'):
+        return jsonify({'success': False, 'error': 'Invalid filename'})
+    full_path = os.path.join("/root/.openclaw/workspace/Amazon/logs", filename)
+    if not os.path.exists(full_path):
+        return jsonify({'success': False, 'error': 'File not found'})
+    with open(full_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    return jsonify({'success': True, 'content': content})
+
+@app.route('/api/amazon/screenshot', methods=['GET'])
+def get_amazon_screenshot():
+    """Serve screenshot file from the logs directory"""
+    path = request.args.get('path')
+    if not path:
+        return "Missing path", 400
+    # Security: only allow .png in logs dir
+    if '..' in path or not path.endswith('.png'):
+        return "Invalid path", 400
+    # Check if path is inside logs directory
+    full_path = path
+    if not os.path.exists(full_path):
+        return "Not found", 404
+    # Send the file
+    with open(full_path, 'rb') as f:
+        image_data = f.read()
+    return app.response_class(image_data, mimetype='image/png')
 
 if __name__ == '__main__':
     # 同时启用 HTTP (8081) 和 HTTPS (8080)
