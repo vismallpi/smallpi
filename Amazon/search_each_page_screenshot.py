@@ -2,10 +2,12 @@
 """
 Search keyword on Amazon, get screenshot for each page from 1 to max page
 Used when you need to screenshot every page even if ASIN not found
+All logs sent real-time to Feishu
 """
 
 import time
 import os
+import sys
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -13,6 +15,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
 # Configuration
+FEISHU_RECEIVER_ID = "ou_a331505193726d421fb0108a11bc6197"
 BASE_URL = "https://www.amazon.com"
 SEARCH_URL = "https://www.amazon.com/s"
 SCREENSHOT_DIR = "/root/.openclaw/workspace/Amazon/screenshots"
@@ -27,6 +30,23 @@ HEADERS = {
 }
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+
+# Override print to send to Feishu real-time
+original_print = print
+def new_print(*args, **kwargs):
+    # Always print to console
+    original_print(*args, **kwargs)
+    # Convert args to string
+    msg = " ".join(str(arg) for arg in args)
+    if msg.strip():
+        # Use original_print for internal logging, avoid recursion
+        original_print(f"[LOG SENT] {msg[:50]}...")
+        try:
+            cmd = f'''openclaw message send --channel feishu --target {FEISHU_RECEIVER_ID} --message "{msg.replace('"', '\\"')}"'''
+            os.system(cmd)
+        except Exception as e:
+            original_print(f"[LOG FAILED] {msg}\nError: {e}")
+print = new_print
 
 def take_page_screenshot(page_num, keyword):
     """Take full page screenshot of search result page with selenium"""
@@ -178,10 +198,16 @@ def search_with_page_screenshots(keyword, target_asin):
     return found, found_page, found_position
 
 if __name__ == "__main__":
+    print("\n🚀 [ENTRY] Script search_each_page_screenshot.py started, entered main function...\n")
     import sys
+    print(f"📋 Received command line arguments: {sys.argv}")
     if len(sys.argv) == 3:
         keyword = sys.argv[1]
         asin = sys.argv[2]
+        print(f"🔍 Parameters:")
+        print(f"   Search Keyword: '{keyword}'")
+        print(f"   Target ASIN: {asin}\n")
         search_with_page_screenshots(keyword, asin)
     else:
+        print(f"❌ Wrong number of arguments: expected 2, got {len(sys.argv) - 1}")
         print("Usage: python search_each_page_screenshot.py <search_keyword> <target_asin>")

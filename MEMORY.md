@@ -45,3 +45,18 @@ This file stores important decisions, lessons learned, and key information that 
     2. 将生成的两张截图 (`B0CWZ2Z5TS_screenshot.png` 和 `B0DDDWWJBC_screenshot.png`) 也发送给魏总
     3. 方便用户校验执行结果
 
+## 2026-05-03
+
+- Amazon搜索控制面板开发迭代：
+  - **v1.0 ~ v1.4** 功能迭代：
+    1.  将常用ASIN改为下拉选择框（B0DDDWWJBC NEW / B0CWZ2Z5TS OLD），传递参数只传纯ASIN值，符合需求
+    2.  将常用14个搜索关键词加入datalist，支持选择+可编辑
+    3.  重构了section顺序：Manual搜索放第一个，Auto每日监控放第二个
+    4.  修复了HTML标签嵌套错误，解决了第一个按钮点击无响应问题
+  - **v1.4.5 ~ v1.4.6** 修复实时日志问题：
+    1.  原设计print覆盖导致无限递归死循环，已修复
+    2.  改为内部使用原始print避免递归，所有日志实时发送到飞书对话框
+    3.  入口处增加参数打印，方便调试确认参数正确传递
+  - 当前最新版本：**v1.4.6**
+  - 访问地址：`http://101.96.196.120:8081/static/amazon_search_control.html`
+

@@ -94,6 +94,15 @@
             background-color: #ffffff;
         }
 
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e9e9e7;
+            border-radius: 2px;
+            font-size: 16px;
+            background-color: #fafafa;
+        }
+
         button {
             padding: 12px 20px;
             background-color: #A9C5ED;
@@ -182,6 +191,208 @@
             }
         }
     </style>
+
+<script>
+const API_BASE = '/api';
+
+function runScript(scriptName) {
+    try {
+        if (scriptName === 'amazon_search_mosaic_kits.py') {
+            fetch('/api/run-auto-search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) alert(result.message);
+                else alert('Run failed: ' + result.error);
+            })
+            .catch(error => {
+                alert('Request failed: ' + error.message);
+            });
+        }
+    } catch (e) {
+        alert('JS Error: ' + e.message);
+    }
+}
+
+function runManualSearch() {
+    try {
+        console.log('runManualSearch triggered');
+        const keywordInput = document.getElementById('keyword');
+        const asinSelect = document.getElementById('asin');
+        
+        if (!keywordInput || !asinSelect) {
+            alert('Error: Cannot find input elements #keyword or #asin');
+            return;
+        }
+        
+        const keyword = keywordInput.value;
+        const asin = asinSelect.value;
+        
+        if (!keyword || !asin) {
+            alert('Please fill in search keyword AND select target ASIN!');
+            return;
+        }
+        
+        console.log('Sending:', { keyword, asin });
+        
+        fetch('/api/run-manual-search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keyword, asin })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) alert(result.message);
+            else alert('Run failed: ' + result.error);
+        })
+        .catch(error => {
+            alert('Request failed: ' + error.message);
+            console.error('Fetch error:', error);
+        });
+    } catch (e) {
+        alert('JavaScript Error: ' + e.message);
+        console.error('JS Error:', e);
+    }
+}
+
+function runFullPageScreenshot() {
+    try {
+        const keyword = document.getElementById('keyword_full').value;
+        const asin = document.getElementById('asin_full').value;
+        if (!keyword || !asin) {
+            alert('Please fill in search keyword and target ASIN!');
+            return;
+        }
+        fetch('/api/run-fullpage-screenshot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ keyword, asin })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) alert(result.message);
+            else alert('Run failed: ' + result.error);
+        })
+        .catch(error => {
+            alert('Request failed: ' + error.message);
+        });
+    } catch (e) {
+        alert('JavaScript Error: ' + e.message);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, binding events');
+    
+    // 绑定按钮点击事件
+    document.getElementById('btn-run-manual').addEventListener('click', function() {
+        console.log('Button clicked');
+        runManualSearch();
+    });
+    
+    document.getElementById('btn-run-auto').addEventListener('click', function() {
+        runScript('amazon_search_mosaic_kits.py');
+    });
+    
+    document.getElementById('btn-run-full').addEventListener('click', function() {
+        runFullPageScreenshot();
+    });
+    
+    // 加载页面标题
+    loadPageTitle();
+    
+    // 绑定可编辑内容
+    const editableElements = document.querySelectorAll('[contenteditable="true"]');
+    editableElements.forEach(el => {
+        const key = 'content_' + generateId(el);
+        el.dataset.saveKey = key;
+        loadEditableContent(el);
+        el.addEventListener('input', () => {
+            saveEditableContent(el);
+        });
+    });
+    
+    // 绑定标题保存
+    const pageTitleEl = document.getElementById('pageTitle');
+    if (pageTitleEl) {
+        pageTitleEl.addEventListener('input', () => {
+            const currentTitle = pageTitleEl.textContent.trim();
+            fetch(`${API_BASE}/page-title-amazon`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: currentTitle })
+            });
+        });
+    }
+});
+
+// ==================== 页面标题保存功能 ====================
+function loadPageTitle() {
+    const pageTitleEl = document.getElementById('pageTitle');
+    if (!pageTitleEl) return;
+    
+    fetch(`${API_BASE}/page-title-amazon`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.title) {
+            pageTitleEl.textContent = data.title;
+        }
+    })
+    .catch(error => {
+        console.error('加载标题失败', error);
+    });
+}
+
+// ==================== 可编辑内容 ====================
+function generateId(el) {
+    let id = el.tagName.toLowerCase();
+    if (el.className) {
+        id += '_' + el.className.replace(/\s+/g, '_');
+    }
+    const all = Array.from(document.querySelectorAll('[contenteditable="true"]'));
+    const index = all.indexOf(el);
+    id += '_' + index;
+    return id;
+}
+
+function loadEditableContent(el) {
+    const key = el.dataset.saveKey;
+    fetch(`${API_BASE}/editable-content?key=${key}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.content !== null) {
+            el.innerHTML = data.content;
+        }
+    })
+    .catch(error => {
+        console.error('加载内容失败', key, error);
+    });
+}
+
+function saveEditableContent(el) {
+    const key = el.dataset.saveKey;
+    const content = el.innerHTML;
+    fetch(`${API_BASE}/editable-content`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, content })
+    })
+    .catch(error => {
+        console.error('保存内容失败', key, error);
+    });
+}
+</script>
 </head>
 <body>
     <div class="container">
@@ -190,231 +401,82 @@
             <a href="/static/amazon_search_control.html" class="tab-item active">Amazon Search</a>
         </div>
         <div class="content-wrapper">
-        <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Amazon Keyword Search Control Panel</h1>
-        <div class="version-info">
-            v1.1.0
-        </div>
-
-        <div class="script-item">
-            <h2 contenteditable="true" style="cursor: text;">1. Auto-run Script - amazon_search_mosaic_kits.py</h2>
-            <div class="description" contenteditable="true" style="cursor: text;">
-                <strong>Function:</strong> Auto-search based on configuration, find target ASINs (<code>B0DDDWWJBC</code> & <code>B0CWZ2Z5TS</code>), send logs and screenshots to you after completion.<br>
-                Current search keyword configured as: <code>mosaic kits for adults</code>
+            <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Amazon Keyword Search Control Panel</h1>
+            <div class="version-info">
+                v1.4.6 - Fixed infinite recursion bug in real-time logging, added parameters print on entry
             </div>
-            <button onclick="runScript('amazon_search_mosaic_kits.py')">Run Now</button>
-        </div>
 
-        <div class="script-item">
-            <h2 contenteditable="true" style="cursor: text;">2. Manual Single Search - amazon_search_asin_screenshot.py</h2>
-            <div class="description" contenteditable="true" style="cursor: text;">
-                <strong>Function:</strong> Custom keyword & target ASIN, auto-search and take screenshot when ASIN found.
+            <div class="script-item">
+                <h2 contenteditable="true" style="cursor: text;">1. Manual Single Search - amazon_search_asin_screenshot.py</h2>
+                <div class="description" contenteditable="true" style="cursor: text;">
+                    <strong>Function:</strong> Custom keyword & target ASIN, auto-search and take screenshot when ASIN found.
+                </div>
+                <div class="input-group">
+                    <label for="keyword">Search Keyword:</label>
+                    <input type="text" id="keyword" placeholder="e.g. mosaic kits for adults" list="keywordList">
+                    <datalist id="keywordList">
+                        <option value="mosaic kits for adults"></option>
+                        <option value="adult mosaic art kits"></option>
+                        <option value="diy mosaic kits for adults"></option>
+                        <option value="complete mosaic kits"></option>
+                        <option value="beginner mosaic kits"></option>
+                        <option value="mosaic craft kits"></option>
+                        <option value="mosaic planter kit"></option>
+                        <option value="mosaic flower pot kit"></option>
+                        <option value="glass mosaic kits for adults"></option>
+                        <option value="large mosaic kits"></option>
+                        <option value="creative mosaic kits"></option>
+                        <option value="mosaic hobby kits"></option>
+                        <option value="handmade mosaic kit"></option>
+                        <option value="mosaic diy craft kit"></option>
+                    </datalist>
+                </div>
+                <div class="input-group">
+                    <label for="asin">Target ASIN:</label>
+                    <select id="asin">
+                        <option value="">-- Please select --</option>
+                        <option value="B0DDDWWJBC">B0DDDWWJBC (NEW)</option>
+                        <option value="B0CWZ2Z5TS">B0CWZ2Z5TS (OLD)</option>
+                    </select>
+                </div>
+                <button id="btn-run-manual" onclick="runManualSearch()">Run Search</button>
             </div>
-            <div class="input-group">
-                <label for="keyword">Search Keyword:</label>
-                <input type="text" id="keyword" placeholder="e.g. mosaic kits for adults">
+
+            <div class="script-item">
+                <h2 contenteditable="true" style="cursor: text;">2. Auto-run Daily Script - amazon_search_mosaic_kits.py</h2>
+                <div class="description" contenteditable="true" style="cursor: text;">
+                    <strong>Function:</strong> Auto-search based on fixed configuration (daily monitoring task), find both target ASINs (<code>B0DDDWWJBC (NEW)</code> & <code>B0CWZ2Z5TS (OLD)</code>), send logs and screenshots to you after completion.<br>
+                    This is the daily scheduled task that runs automatically twice a day.
+                </div>
+                <button id="btn-run-auto">Run Now (Manual Trigger)</button>
             </div>
-            <div class="input-group">
-                <label for="asin">Target ASIN:</label>
-                <input type="text" id="asin" placeholder="e.g. B0DDDWWJBC">
+
+            <div class="script-item">
+                <h2 contenteditable="true" style="cursor: text;">3. Full Page Screenshot - search_each_page_screenshot.py</h2>
+                <div class="description" contenteditable="true" style="cursor: text;">
+                    <strong>Function:</strong> Search pages 1-5 for specified keyword, <strong>save screenshot for every page</strong>, all page screenshots will be saved even if target ASIN not found.
+                </div>
+                <div class="input-group">
+                    <label for="keyword_full">Search Keyword:</label>
+                    <input type="text" id="keyword_full" placeholder="e.g. mosaic beginner" list="keywordList">
+                </div>
+                <div class="input-group">
+                    <label for="asin_full">Target ASIN:</label>
+                    <select id="asin_full">
+                        <option value="">-- Please select --</option>
+                        <option value="B0DDDWWJBC">B0DDDWWJBC (NEW)</option>
+                        <option value="B0CWZ2Z5TS">B0CWZ2Z5TS (OLD)</option>
+                    </select>
+                </div>
+                <button id="btn-run-full">Start Full Screenshot</button>
             </div>
-            <button onclick="runManualSearch()">Run Search</button>
-        </div>
 
-        <div class="script-item">
-            <h2 contenteditable="true" style="cursor: text;">3. Full Page Screenshot - search_each_page_screenshot.py</h2>
-            <div class="description" contenteditable="true" style="cursor: text;">
-                <strong>Function:</strong> Search pages 1-5 for specified keyword, <strong>save screenshot for every page</strong>, all page screenshots will be saved even if target ASIN not found.
+            <div class="note" contenteditable="true" style="cursor: text;">
+                <strong>Instructions:</strong><br>
+                1. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
+                2. Click the run button to execute the script<br>
+                3. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
             </div>
-            <div class="input-group">
-                <label for="keyword_full">Search Keyword:</label>
-                <input type="text" id="keyword_full" placeholder="e.g. mosaic beginner">
-            </div>
-            <div class="input-group">
-                <label for="asin_full">Target ASIN:</label>
-                <input type="text" id="asin_full" placeholder="e.g. B0DDDWWJBC">
-            </div>
-            <button onclick="runFullPageScreenshot()">Start Full Screenshot</button>
-        </div>
-
-        <div class="note" contenteditable="true" style="cursor: text;">
-            <strong>Instructions:</strong><br>
-            1. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
-            2. Click the run button to execute the script<br>
-            3. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
-        </div>
-    </div>
-
-    <script>
-        const API_BASE = '/api';
-        async function runScript(scriptName) {
-            if (scriptName === 'amazon_search_mosaic_kits.py') {
-                try {
-                    const response = await fetch('/api/run-auto-search', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                        alert(result.message);
-                    } else {
-                        alert('Run failed: ' + result.error);
-                    }
-                } catch (error) {
-                    alert('Request failed: ' + error.message);
-                }
-            }
-        }
-
-        async function runManualSearch() {
-            const keyword = document.getElementById('keyword').value;
-            const asin = document.getElementById('asin').value;
-            if (!keyword || !asin) {
-                alert('Please fill in search keyword and target ASIN!');
-                return;
-            }
-            try {
-                const response = await fetch('/api/run-manual-search', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ keyword, asin })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    alert(result.message);
-                } else {
-                    alert('Run failed: ' + result.error);
-                }
-            } catch (error) {
-                alert('Request failed: ' + error.message);
-            }
-        }
-
-        async function runFullPageScreenshot() {
-            const keyword = document.getElementById('keyword_full').value;
-            const asin = document.getElementById('asin_full').value;
-            if (!keyword || !asin) {
-                alert('Please fill in search keyword and target ASIN!');
-                return;
-            }
-            try {
-                const response = await fetch('/api/run-fullpage-screenshot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ keyword, asin })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    alert(result.message);
-                } else {
-                    alert('Run failed: ' + result.error);
-                }
-            } catch (error) {
-                alert('Request failed: ' + error.message);
-            }
-        }
-// ==================== 页面标题保存功能 ====================
-const pageTitleEl = document.getElementById('pageTitle');
-
-// 页面加载时读取保存的标题
-async function loadPageTitle() {
-    try {
-        const response = await fetch(`${API_BASE}/page-title-amazon`);
-        const data = await response.json();
-        if (data.success && data.title) {
-            pageTitleEl.textContent = data.title;
-        }
-    } catch (error) {
-        console.error('加载标题失败', error);
-        // 失败了用默认标题
-    }
-}
-
-// 标题修改时自动保存到后端
-pageTitleEl.addEventListener('input', async () => {
-    const currentTitle = pageTitleEl.textContent.trim();
-    try {
-        await fetch(`${API_BASE}/page-title-amazon`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title: currentTitle })
-        });
-    } catch (error) {
-        console.error('保存标题失败', error);
-    }
-});
-
-// 加载标题
-loadPageTitle();
-
-// ==================== 自动保存所有可编辑内容 ====================
-// DOM已经准备好，直接绑定事件
-const editableElements = document.querySelectorAll('[contenteditable="true"]');
-editableElements.forEach(el => {
-    // 生成唯一key
-    const key = 'content_' + generateId(el);
-    el.dataset.saveKey = key;
-    
-    // 加载保存的内容
-    loadEditableContent(el);
-    
-    // 输入时自动保存
-    el.addEventListener('input', () => {
-        saveEditableContent(el);
-    });
-});
-
-// 生成元素唯一ID
-function generateId(el) {
-    let id = el.tagName.toLowerCase();
-    if (el.className) {
-        id += '_' + el.className.replace(/\s+/g, '_');
-    }
-    // 获取所有同类元素，找到当前元素的索引
-    const all = Array.from(document.querySelectorAll('[contenteditable="true"]'));
-    const index = all.indexOf(el);
-    id += '_' + index;
-    return id;
-}
-
-// 加载保存的内容
-async function loadEditableContent(el) {
-    const key = el.dataset.saveKey;
-    try {
-        const response = await fetch(`${API_BASE}/editable-content?key=${key}`);
-        const data = await response.json();
-        if (data.success && data.content !== null) {
-            el.innerHTML = data.content;
-        }
-    } catch (error) {
-        console.error('加载内容失败', key, error);
-    }
-}
-
-// 保存内容
-async function saveEditableContent(el) {
-    const key = el.dataset.saveKey;
-    const content = el.innerHTML;
-    try {
-        await fetch(`${API_BASE}/editable-content`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ key, content })
-        });
-    } catch (error) {
-        console.error('保存内容失败', key, error);
-    }
-}
-    </script>
         </div>
     </div>
 </body>

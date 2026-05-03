@@ -2,10 +2,12 @@
 """
 Amazon ASIN Search and Screenshot Automation
 Function: Search for a keyword on Amazon, find target ASIN, record page/position, take screenshot
+All logs are sent real-time to Feishu dialog
 """
 
 import time
 import os
+import sys
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -14,6 +16,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 # Configuration
+FEISHU_RECEIVER_ID = "ou_a331505193726d421fb0108a11bc6197"
 BASE_URL = "https://www.amazon.com"
 SEARCH_URL = "https://www.amazon.com/s"
 SCREENSHOT_DIR = "/root/.openclaw/workspace/Amazon/screenshots"
@@ -27,6 +30,33 @@ HEADERS = {
 }
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+
+# Send log to Feishu real-time
+def send_log(log_text):
+    """Send log message to Feishu in real-time"""
+    try:
+        cmd = f'''openclaw message send --channel feishu --target {FEISHU_RECEIVER_ID} --message "{log_text.replace('"', '\\"')}"'''
+        os.system(cmd)
+        print(f"[LOG SENT] {log_text[:50]}...")
+    except Exception as e:
+        print(f"[LOG FAILED] {log_text}\nError: {e}")
+
+# Override print to send to Feishu real-time
+original_print = print
+def new_print(*args, **kwargs):
+    # Always print to console
+    original_print(*args, **kwargs)
+    # Convert args to string
+    msg = " ".join(str(arg) for arg in args)
+    if msg.strip():
+        # Use original_print for send_log internal, avoid recursion
+        original_print(f"[LOG SENT] {msg[:50]}...")
+        try:
+            cmd = f'''openclaw message send --channel feishu --target {FEISHU_RECEIVER_ID} --message "{msg.replace('"', '\\"')}"'''
+            os.system(cmd)
+        except Exception as e:
+            original_print(f"[LOG FAILED] {msg}\nError: {e}")
+print = new_print
 
 def search_asin_position(keyword, target_asin):
     """
@@ -240,12 +270,18 @@ def batch_search(keyword_asins):
 if __name__ == "__main__":
     # Example usage:
     # python amazon_search_asin_screenshot.py "mosaic kits for adults" B0DDDWWJBC
+    print("\n🚀 [ENTRY] Script amazon_search_asin_screenshot.py started, entered main function...\n")
     import sys
+    print(f"📋 Received command line arguments: {sys.argv}")
     if len(sys.argv) == 3:
         keyword = sys.argv[1]
         asin = sys.argv[2]
+        print(f"🔍 Parameters:")
+        print(f"   Search Keyword: '{keyword}'")
+        print(f"   Target ASIN: {asin}\n")
         search_and_screenshot(keyword, asin)
     else:
+        print(f"❌ Wrong number of arguments: expected 2, got {len(sys.argv) - 1}")
         print("Usage: python amazon_search_asin_screenshot.py <search_keyword> <target_asin>")
         print("\nExample:")
         print("  python amazon_search_asin_screenshot.py \"mosaic kits for adults\" B0DDDWWJBC")
