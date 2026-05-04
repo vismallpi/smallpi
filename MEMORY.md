@@ -60,3 +60,18 @@ This file stores important decisions, lessons learned, and key information that 
   - 当前最新版本：**v1.4.6**
   - 访问地址：`http://101.96.196.120:8081/static/amazon_search_control.html`
 
+## 2026-05-04
+
+- Flask web服务（todo + amazon search）现在使用 **supervisor** 进程管理：
+  - 配置文件：`/etc/supervisor/conf.d/webproj.conf`
+  - 自动启动、自动重启，崩溃后自动恢复，不会再出现莫名其妙无法访问的情况
+  - 手动管理命令：
+    ```
+    supervisorctl status webproj    # 查看状态
+    supervisorctl restart webproj  # 重启服务
+    supervisorctl stop webproj     # 停止服务
+    ```
+  - 监听端口：
+    - `0.0.0.0:8080` (HTTPS)
+    - `0.0.0.0:8081` (HTTP)
+
