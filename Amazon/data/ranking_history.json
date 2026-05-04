@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": 1777865374,
+    "date_str": "2026-05-04 11:29:34",
+    "asin": "B0DDDWWJBC",
+    "arts_rank": 76839,
+    "mosaic_rank": 283,
+    "rating": 4.0,
+    "num_reviews": 17
+  },
+  {
+    "timestamp": 1777865374,
+    "date_str": "2026-05-04 11:29:34",
+    "asin": "B0CWZ2Z5TS",
+    "arts_rank": 47753,
+    "mosaic_rank": 167,
+    "rating": 4.4,
+    "num_reviews": 31
+  }
+]

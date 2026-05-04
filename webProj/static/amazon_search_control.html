@@ -971,28 +971,84 @@ function renderTrendChart(data) {
 }
 
 function renderTrendTable(data) {
-    const tbody = document.getElementById('trend-table-body');
-    tbody.innerHTML = '';
+    const container = document.getElementById('trend-table-container');
+    container.innerHTML = '';
     
     if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #9b9a97;">No historical data yet</td></tr>`;
+        container.innerHTML = `<div style="padding: 20px; text-align: center; color: #9b9a97;">No historical data yet</div>`;
         return;
     }
     
-    // Sort by newest first
-    data.sort((a, b) => b.timestamp - a.timestamp);
-    
+    // Group by ASIN
+    const grouped = {};
     data.forEach(record => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="border: 1px solid #e9e9e7; padding: 8px;">${record.date_str}</td>
-            <td style="border: 1px solid #e9e9e7; padding: 8px;">${record.asin}</td>
-            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.arts_rank || '-'}</td>
-            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.mosaic_rank || '-'}</td>
-            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.rating || '-'}</td>
-            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.num_reviews || '-'}</td>
+        if (!grouped[record.asin]) {
+            grouped[record.asin] = [];
+        }
+        grouped[record.asin].push(record);
+    });
+    
+    // Column headers that are editable
+    const headers = {
+        'date_str': 'Date',
+        'arts_rank': 'Arts, Crafts & Sewing Rank',
+        'mosaic_rank': 'Mosaic Tiles Rank',
+        'rating': 'Customer Rating',
+        'num_reviews': 'Number of Reviews'
+    };
+    
+    // For each ASIN, create a separate table
+    Object.keys(grouped).forEach(asin => {
+        const records = grouped[asin];
+        // Sort by newest first
+        records.sort((a, b) => b.timestamp - a.timestamp);
+        
+        const tableDiv = document.createElement('div');
+        tableDiv.style.marginBottom = '24px';
+        tableDiv.innerHTML = `
+            <h4 contenteditable="true" style="margin-top: 0; margin-bottom: 10px; color: #37352f; cursor: text;">ASIN: ${asin} - Historical Data</h4>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid #e9e9e7;">
+                    <thead>
+                        <tr style="background-color: #f7f6f3;">
+                            <th contenteditable="true" style="border: 1px solid #e9e9e7; padding: 8px; text-align: left;">${headers.date_str}</th>
+                            <th contenteditable="true" style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${headers.arts_rank}</th>
+                            <th contenteditable="true" style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${headers.mosaic_rank}</th>
+                            <th contenteditable="true" style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${headers.rating}</th>
+                            <th contenteditable="true" style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${headers.num_reviews}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         `;
-        tbody.appendChild(tr);
+        
+        const tbody = tableDiv.querySelector('tbody');
+        records.forEach(record => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="border: 1px solid #e9e9e7; padding: 8px;">${record.date_str}</td>
+                <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.arts_rank || '-'}</td>
+                <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.mosaic_rank || '-'}</td>
+                <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.rating || '-'}</td>
+                <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.num_reviews || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        // Make all contenteditable elements auto-save
+        const editableElements = tableDiv.querySelectorAll('[contenteditable="true"]');
+        editableElements.forEach(el => {
+            const key = 'trend-table-' + asin + '-' + el.textContent.trim().replace(/\s+/g, '-');
+            el.dataset.saveKey = key;
+            loadEditableContent(el);
+            el.addEventListener('blur', () => {
+                saveEditableContent(el);
+            });
+        });
+        
+        container.appendChild(tableDiv);
     });
 }
 </script>
