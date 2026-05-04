@@ -67,7 +67,6 @@
         }
 
         .script-header .title {
-            cursor: pointer;
             flex: 1;
         }
 
@@ -79,13 +78,7 @@
         }
 
         .script-content-main {
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .script-header.collapsed + .script-content-main {
-            max-height: 0;
-            opacity: 0;
+            background-color: #ffffff;
         }
 
         pre.script-code-modal {
@@ -378,7 +371,27 @@
                 width: 100%;
             }
         }
+
+        pre.script-code-modal {
+            margin: 0;
+            padding: 16px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            white-space: pre;
+            word-wrap: normal;
+            overflow-x: auto;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            max-height: calc(70vh - 80px);
+            border-radius: 4px;
+        }
     </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
 
 <script>
 const API_BASE = '/api';
@@ -722,7 +735,7 @@ async function saveEditableContent(el) {
 
             <div class="script-group">
                 <div class="script-header">
-                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=manual]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                    <div class="title">
                         <h2 contenteditable="true">1. Manual Single Search - amazon_search_asin_screenshot.py</h2>
                     </div>
                     <span class="view-code-icon" onclick="openSourceCodeModal('amazon_search_asin_screenshot.py', 'Manual Single Search - amazon_search_asin_screenshot.py');">▶</span>
@@ -768,7 +781,7 @@ async function saveEditableContent(el) {
 
             <div class="script-group">
                 <div class="script-header">
-                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=auto]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                    <div class="title">
                         <h2 contenteditable="true">2. Auto-run Daily Script - amazon_search_mosaic_kits.py</h2>
                     </div>
                     <span class="view-code-icon" onclick="openSourceCodeModal('amazon_search_mosaic_kits.py', 'Auto-run Daily Script - amazon_search_mosaic_kits.py');">▶</span>
@@ -787,7 +800,7 @@ async function saveEditableContent(el) {
 
             <div class="script-group">
                 <div class="script-header">
-                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=ranking]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                    <div class="title">
                         <h2 contenteditable="true">3. Ranking Check & Update - amazon-ranking-check.py</h2>
                     </div>
                     <span class="view-code-icon" onclick="openSourceCodeModal('amazon-ranking-check.py', 'Ranking Check & Update - amazon-ranking-check.py');">▶</span>
@@ -807,12 +820,12 @@ async function saveEditableContent(el) {
 
             <div class="script-group">
                 <div class="script-header">
-                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=instructions]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                    <div class="title">
                         <h2 contenteditable="true">Instructions</h2>
                     </div>
                     <span class="view-code-icon"></span>
                 </div>
-                <div class="script-content-main collapsed" data-script="instructions">
+                <div class="script-content-main" data-script="instructions">
                     <div class="description" contenteditable="true" style="cursor: text;">
                         <strong>How to use:</strong><br>
                         1. <strong>Left (title area):</strong> click to expand/collapse the main content (inputs & buttons)<br>
@@ -907,7 +920,11 @@ function openSourceCodeModal(scriptName, title) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('source-modal-content').textContent = data.content;
+            const contentEl = document.getElementById('source-modal-content');
+            contentEl.textContent = data.content;
+            // Apply syntax highlighting
+            contentEl.className = 'script-code-modal language-python';
+            hljs.highlightElement(contentEl);
         } else {
             document.getElementById('source-modal-content').textContent = `Failed to load: ${data.error || 'Unknown error'}`;
         }
