@@ -506,6 +506,30 @@ def get_ranking_history():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+# ==================== Get Python source code for display ====================
+@app.route('/api/amazon/source-code/<script_name>', methods=['GET'])
+def get_source_code(script_name):
+    """Get the source code of the script to display on web page"""
+    base_dir = "/root/.openclaw/workspace/Amazon/"
+    allowed_scripts = {
+        'amazon_search_asin_screenshot.py',
+        'amazon_search_mosaic_kits.py',
+        'amazon-ranking-check.py'
+    }
+    if script_name not in allowed_scripts:
+        return jsonify({'success': False, 'error': 'Script not allowed'})
+    
+    full_path = os.path.join(base_dir, script_name)
+    if not os.path.exists(full_path):
+        return jsonify({'success': False, 'error': 'Script not found'})
+    
+    try:
+        with open(full_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return jsonify({'success': True, 'content': content})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/api/amazon/log-content', methods=['GET'])
 def get_amazon_log_content():
     """Get content of a specific log file"""

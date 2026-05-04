@@ -64,27 +64,59 @@
             color: #37352f;
             background-color: #f7f6f3;
             border-bottom: 1px solid #f0f0ee;
+        }
+
+        .script-header .title {
             cursor: pointer;
+            flex: 1;
         }
 
         .script-header .toggle-icon {
             color: #9b9a97;
             font-size: 16px;
             transition: transform 0.3s ease;
+            cursor: pointer;
+            padding: 0 8px;
         }
 
         .script-header.collapsed .toggle-icon {
             transform: rotate(-90deg);
         }
 
-        .script-content {
+        .script-content-main {
             transition: all 0.3s ease;
             overflow: hidden;
         }
 
-        .script-header.collapsed + .script-content {
+        .script-code-block {
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background-color: #f7f6f3;
+            border-top: 1px solid #f0f0ee;
+        }
+
+        .script-header.collapsed + .script-content-main + .script-code-block {
             max-height: 0;
             opacity: 0;
+        }
+
+        .script-header.collapsed + .script-content-main {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        pre.script-code {
+            margin: 0;
+            padding: 12px 16px;
+            background-color: #f7f6f3;
+            white-space: pre;
+            word-wrap: normal;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         h2 {
@@ -633,7 +665,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize all sections as expanded by default
     // User can collapse them if they want
+
+    // Load source code for each script when page loads
+    loadScriptSource('amazon_search_asin_screenshot.py', 'code-manual');
+    loadScriptSource('amazon_search_mosaic_kits.py', 'code-auto');
+    loadScriptSource('amazon-ranking-check.py', 'code-ranking');
 });
+
+// Load source code from server and display
+function loadScriptSource(scriptName, elementId) {
+    fetch(`${API_BASE}/amazon/source-code/${scriptName}`)
+    .then(response => response.json())
+    .then(data => {
+        const el = document.getElementById(elementId);
+        if (data.success) {
+            el.textContent = data.content;
+        } else {
+            el.textContent = `Failed to load: ${data.error || 'Unknown error'}`;
+        }
+    })
+    .catch(error => {
+        const el = document.getElementById(elementId);
+        el.textContent = `Request failed: ${error.message}`;
+    });
+}
 
 // ==================== 页面标题保存功能 ====================
 function loadPageTitle() {
@@ -705,11 +760,13 @@ async function saveEditableContent(el) {
             </div>
 
             <div class="script-group">
-                <div class="script-header" onclick="this.classList.toggle('collapsed')">
-                    <h2 contenteditable="true">1. Manual Single Search - amazon_search_asin_screenshot.py</h2>
-                    <span class="toggle-icon">▶</span>
+                <div class="script-header">
+                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=manual]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                        <h2 contenteditable="true">1. Manual Single Search - amazon_search_asin_screenshot.py</h2>
+                    </div>
+                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=manual]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
                 </div>
-                <div class="script-content">
+                <div class="script-content-main" data-script="manual">
                     <div class="description" contenteditable="true" style="cursor: text;">
                         <strong>Function:</strong> Custom keyword & target ASIN, auto-search and take screenshot when ASIN found.
                     </div>
@@ -746,14 +803,19 @@ async function saveEditableContent(el) {
                         <button class="secondary" onclick="openLogModal('manual')">View Latest Log</button>
                     </div>
                 </div>
+                <div class="script-code-block" data-script="manual">
+<pre class="script-code" id="code-manual">Loading source code...</pre>
+                </div>
             </div>
 
             <div class="script-group">
-                <div class="script-header" onclick="this.classList.toggle('collapsed')">
-                    <h2 contenteditable="true">2. Auto-run Daily Script - amazon_search_mosaic_kits.py</h2>
-                    <span class="toggle-icon">▶</span>
+                <div class="script-header">
+                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=auto]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                        <h2 contenteditable="true">2. Auto-run Daily Script - amazon_search_mosaic_kits.py</h2>
+                    </div>
+                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=auto]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
                 </div>
-                <div class="script-content">
+                <div class="script-content-main" data-script="auto">
                     <div class="description" contenteditable="true" style="cursor: text;">
                         <strong>Function:</strong> Auto-search based on fixed configuration (daily monitoring task), find both target ASINs (<code>B0DDDWWJBC (NEW)</code> & <code>B0CWZ2Z5TS (OLD)</code>), send logs and screenshots to you after completion.<br>
                         This is the daily scheduled task that runs automatically twice a day.
@@ -763,14 +825,19 @@ async function saveEditableContent(el) {
                         <button class="secondary" onclick="openLogModal('auto')">View Latest Log</button>
                     </div>
                 </div>
+                <div class="script-code-block" data-script="auto">
+<pre class="script-code" id="code-auto">Loading source code...</pre>
+                </div>
             </div>
 
             <div class="script-group">
-                <div class="script-header" onclick="this.classList.toggle('collapsed')">
-                    <h2 contenteditable="true">3. Ranking Check & Update - amazon-ranking-check.py</h2>
-                    <span class="toggle-icon">▶</span>
+                <div class="script-header">
+                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=ranking]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                        <h2 contenteditable="true">3. Ranking Check & Update - amazon-ranking-check.py</h2>
+                    </div>
+                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=ranking]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
                 </div>
-                <div class="script-content">
+                <div class="script-content-main" data-script="ranking">
                     <div class="description" contenteditable="true" style="cursor: text;">
                         <strong>Function:</strong> Extract current product rankings (Arts, Crafts & Sewing / Mosaic Tiles), customer rating and review counts, save to local history file, show trend chart.<br>
                         Runs automatically after daily search, can also manually trigger to update rankings now.
@@ -781,23 +848,32 @@ async function saveEditableContent(el) {
                         <button class="secondary" onclick="openTrendModal()">📈 View Ranking Trend</button>
                     </div>
                 </div>
+                <div class="script-code-block" data-script="ranking">
+<pre class="script-code" id="code-ranking">Loading source code...</pre>
+                </div>
             </div>
 
             <div class="script-group">
-                <div class="script-header" onclick="this.classList.toggle('collapsed')">
-                    <h2 contenteditable="true">Instructions</h2>
-                    <span class="toggle-icon">▶</span>
+                <div class="script-header">
+                    <div class="title" onclick="document.querySelector('.script-content-main[data-script=instructions]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
+                        <h2 contenteditable="true">Instructions</h2>
+                    </div>
+                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=instructions]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
                 </div>
-                <div class="script-content collapsed">
+                <div class="script-content-main collapsed" data-script="instructions">
                     <div class="description" contenteditable="true" style="cursor: text;">
                         <strong>How to use:</strong><br>
-                        1. Click the section header to expand/collapse (the > arrow)<br>
-                        2. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
-                        3. Click the run button to execute the script<br>
-                        4. Click "View Latest Log" to open real-time log viewer<br>
-                        5. Click "📈 View Ranking Trend" to see the history ranking chart and table<br>
-                        6. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
+                        1. <strong>Left (title area):</strong> click to expand/collapse the main content (inputs & buttons)<br>
+                        2. <strong>Right (> arrow):</strong> click to expand/collapse the original Python source code<br>
+                        3. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
+                        4. Click the run button to execute the script<br>
+                        5. Click "View Latest Log" to open real-time log viewer<br>
+                        6. Click "📈 View Ranking Trend" to see the history ranking chart and table<br>
+                        7. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
                     </div>
+                </div>
+                <div class="script-code-block" data-script="instructions">
+<pre class="script-code" id="code-instructions">No source code for instructions section</pre>
                 </div>
             </div>
         </div>
