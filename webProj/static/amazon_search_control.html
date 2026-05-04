@@ -90,16 +90,38 @@
 
         pre.script-code-modal {
             margin: 0;
-            padding: 0;
+            padding: 8px 8px 8px 50px;
             background-color: #ffffff;
+            color: #333333;
             white-space: pre;
             word-wrap: normal;
             overflow-x: auto;
             overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-            line-height: 1.4;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
             max-height: calc(70vh - 80px);
+            border-radius: 4px;
+            position: relative;
+            counter-reset: line;
+            border: 1px solid #e0e0e0;
+        }
+
+        pre.script-code-modal code {
+            display: block;
+            counter-increment: line;
+        }
+
+        pre.script-code-modal code::before {
+            content: counter(line);
+            display: inline-block;
+            width: 40px;
+            text-align: right;
+            padding-right: 10px;
+            margin-left: -42px;
+            color: #999999;
+            border-right: 1px solid #dddddd;
+            background-color: #f5f5f5;
         }
 
         h2 {
@@ -415,7 +437,7 @@
         }
     </style>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
 
