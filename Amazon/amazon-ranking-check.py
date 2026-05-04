@@ -3,7 +3,52 @@ import subprocess
 import re
 import json
 import os
+import time
+import pytz
 from datetime import datetime
+
+# Configuration
+# 接收log的飞书用户open_id
+FEISHU_RECEIVER_ID = "ou_a331505193726d421fb0108a11bc6197"
+
+# Save original print before overriding
+original_print = print
+
+# Create log file with timestamp
+RUN_ID = int(time.time())
+LOG_FILE = f"/root/.openclaw/workspace/Amazon/logs/{RUN_ID}_ranking_check.log"
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+
+# Send log to Feishu real-time + write to file with timestamp
+def send_log(log_text):
+    """Send log message to Feishu in real-time + write to log file"""
+    from datetime import datetime
+    beijing_tz = pytz.timezone('Asia/Shanghai')
+    now = datetime.now(beijing_tz).strftime('%Y-%m-%d %H:%M:%S')
+    log_line = f"[{now}] {log_text}"
+    
+    try:
+        # Write to log file
+        with open(LOG_FILE, 'a', encoding='utf-8') as f:
+            f.write(log_line + '\n')
+        # Send to Feishu
+        cmd = f'''openclaw message send --channel feishu --target {FEISHU_RECEIVER_ID} --message "{log_text.replace('"', '\\"')}"'''
+        os.system(cmd)
+        original_print(f"[LOG SENT + FILE] {log_text[:50]}...")
+    except Exception as e:
+        original_print(f"[LOG FAILED] {log_text}\nError: {e}")
+
+# Override print to send to Feishu real-time + write to file
+def new_print(*args, **kwargs):
+    # Always print to console (original)
+    original_print(*args, **kwargs)
+    # Convert args to string
+    msg = " ".join(str(arg) for arg in args)
+    if msg.strip():
+        # Send to Feishu and write to file
+        send_log(msg)
+
+print = new_print
 
 def get_product_info(asin):
     cmd = f'/usr/bin/microsoft-edge-stable --headless=new --disable-gpu --no-sandbox --dump-dom "https://www.amazon.com/dp/{asin}/" 2>/dev/null'

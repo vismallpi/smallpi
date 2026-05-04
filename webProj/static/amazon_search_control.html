@@ -442,6 +442,34 @@ function runFullPageScreenshot() {
     }
 }
 
+function runRankingCheck() {
+    try {
+        fetch('/api/run-ranking-check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) {
+                alert(result.message);
+                // Clear cache to load latest log
+                lastLog.ranking = null;
+            } else {
+                alert('Run failed: ' + result.error);
+            }
+        })
+        .catch(error => {
+            alert('Request failed: ' + error.message);
+        });
+    } catch (e) {
+        alert('JavaScript Error: ' + e.message);
+        console.error('JS Error:', e);
+    }
+}
+
 // ========== Log Viewer ==========
 // Store last log filename for each section
 let lastLog = {
