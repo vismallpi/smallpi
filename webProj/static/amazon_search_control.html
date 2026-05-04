@@ -381,7 +381,7 @@
 
         pre.script-code-modal {
             margin: 0;
-            padding: 16px 16px 16px 50px;
+            padding: 8px 8px 8px 50px;
             background-color: #1e1e1e;
             color: #d4d4d4;
             white-space: pre;
@@ -404,15 +404,14 @@
 
         pre.script-code-modal code::before {
             content: counter(line);
-            position: absolute;
-            left: 0;
-            top: 0;
+            display: inline-block;
             width: 40px;
             text-align: right;
             padding-right: 10px;
+            margin-left: -42px;
             color: #858585;
-            border-right: 1px solid #444;
             background-color: #252526;
+            border-right: 1px solid #444;
         }
     </style>
 
