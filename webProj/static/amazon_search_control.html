@@ -815,8 +815,188 @@ async function saveEditableContent(el) {
             <div class="modal-body">
                 <pre id="log-content">Loading...</pre>
                 <div id="screenshot-gallery"></div>
+                <div style="margin-top: 16px; text-align: center;">
+                    <button onclick="openTrendModal();" style="padding: 10px 20px; background-color: #A9C5ED; border: 1px solid #8CA6D9; border-radius: 2px; color: #2d3b55; font-size: 15px; font-weight: 500; cursor: pointer;">📈 View Ranking Trend</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Trend Chart Modal -->
+    <div id="trend-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 id="trend-modal-title">Amazon Ranking History Trend</h3>
+                <button class="modal-close" onclick="closeTrendModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="trend-chart-container" style="height: 400px; margin-bottom: 24px;">
+                    <canvas id="trend-chart"></canvas>
+                </div>
+                <div id="trend-table-container">
+                    <h4 style="margin-top: 0; margin-bottom: 10px; color: #37352f;">Historical Data Table</h4>
+                    <div style="overflow-x: auto;">
+                        <table id="trend-table" style="width: 100%; border-collapse: collapse; border: 1px solid #e9e9e7;">
+                            <thead>
+                                <tr style="background-color: #f7f6f3;">
+                                    <th style="border: 1px solid #e9e9e7; padding: 8px; text-align: left;">Date</th>
+                                    <th style="border: 1px solid #e9e9e7; padding: 8px; text-align: left;">ASIN</th>
+                                    <th style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">Arts Rank</th>
+                                    <th style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">Mosaic Rank</th>
+                                    <th style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">Rating</th>
+                                    <th style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">Reviews</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trend-table-body">
+                                <tr><td colspan="6" style="padding: 20px; text-align: center; color: #9b9a97;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script>
+let rankingChart = null;
+
+function openTrendModal() {
+    const modal = document.getElementById('trend-modal');
+    modal.style.display = 'block';
+    loadRankingData();
+}
+
+function closeTrendModal() {
+    const modal = document.getElementById('trend-modal');
+    modal.style.display = 'none';
+}
+
+// Click outside to close modal
+window.onclick = function(event) {
+    const logModal = document.getElementById('log-modal');
+    const trendModal = document.getElementById('trend-modal');
+    if (event.target == logModal) {
+        closeLogModal();
+    }
+    if (event.target == trendModal) {
+        closeTrendModal();
+    }
+}
+
+function loadRankingData() {
+    fetch(`${API_BASE}/amazon/ranking-history`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            renderTrendChart(data.data);
+            renderTrendTable(data.data);
+        } else {
+            document.getElementById('trend-table-body').innerHTML = 
+                `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #9b9a97;">Failed to load: ${data.error || 'Unknown error'}</td></tr>`;
+        }
+    })
+    .catch(error => {
+        document.getElementById('trend-table-body').innerHTML = 
+            `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #9b9a97;">Request failed: ${error.message}</td></tr>`;
+    });
+}
+
+function renderTrendChart(data) {
+    const ctx = document.getElementById('trend-chart').getContext('2d');
+    
+    // Separate data by ASIN
+    const dataB0DD = data.filter(d => d.asin === 'B0DDDWWJBC');
+    const dataB0CW = data.filter(d => d.asin === 'B0CWZ2Z5TS');
+    
+    // Format labels (date strings)
+    const labels = [...new Set(data.map(d => d.date_str.split(' ')[0]))];
+    
+    // Destroy existing chart if it exists
+    if (rankingChart) {
+        rankingChart.destroy();
+    }
+    
+    rankingChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'B0DDDWWJBC - Mosaic Tiles Rank',
+                    data: dataB0DD.map(d => d.mosaic_rank),
+                    borderColor: 'rgb(108, 92, 231)',
+                    backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                },
+                {
+                    label: 'B0CWZ2Z5TS - Mosaic Tiles Rank',
+                    data: dataB0CW.map(d => d.mosaic_rank),
+                    borderColor: 'rgb(253, 121, 168)',
+                    backgroundColor: 'rgba(253, 121, 168, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    reverse: true,  // Lower rank = better, so reverse Y axis
+                    title: {
+                        display: true,
+                        text: 'Category Ranking (lower = better)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Mosaic Tiles Category Ranking Trend (lower rank = better performance)'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        }
+    });
+}
+
+function renderTrendTable(data) {
+    const tbody = document.getElementById('trend-table-body');
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #9b9a97;">No historical data yet</td></tr>`;
+        return;
+    }
+    
+    // Sort by newest first
+    data.sort((a, b) => b.timestamp - a.timestamp);
+    
+    data.forEach(record => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="border: 1px solid #e9e9e7; padding: 8px;">${record.date_str}</td>
+            <td style="border: 1px solid #e9e9e7; padding: 8px;">${record.asin}</td>
+            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.arts_rank || '-'}</td>
+            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.mosaic_rank || '-'}</td>
+            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.rating || '-'}</td>
+            <td style="border: 1px solid #e9e9e7; padding: 8px; text-align: right;">${record.num_reviews || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+</script>
 </body>
 </html>

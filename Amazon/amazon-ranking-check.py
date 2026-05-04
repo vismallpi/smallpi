@@ -115,37 +115,50 @@ def get_product_info(asin):
         'num_reviews': num_reviews
     }
 
-def prepare_bitable_records(data):
-    """Prepare records for Bitable writing with correct timestamp"""
-    # Bitable info
-    app_token = "I2VNbkpkTaUDISsACs5ctFDgnte"
-    table_id = "tblUhqzVlCHz309V"
+def save_to_json(data):
+    """Save ranking data to local JSON file for historical tracking"""
+    # Data file path
+    DATA_FILE = "/root/.openclaw/workspace/Amazon/data/ranking_history.json"
+    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
     
-    # Get current timestamp (milliseconds) - THIS IS CORRECT!
+    # Get current timestamp
     now = datetime.now()
-    query_date = int(now.timestamp() * 1000)
-    query_text = now.strftime('%Y-%m-%d %H:%M')  # 精确到时分，方便区分早晚
+    timestamp = int(now.timestamp())
+    date_str = now.strftime('%Y-%m-%d %H:%M:%S')
     
-    records = []
+    # Load existing data
+    existing = []
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                existing = json.load(f)
+        except:
+            existing = []
+    
+    # Add new records
     for item in data:
-        fields = {
-            "查询时刻": query_date,
-            "查询时间文本": query_text,
-            "ASIN": item['asin'],
-            "大类目排名": int(item['arts_rank']) if item['arts_rank'] else None,
-            "小类目排名": int(item['mosaic_rank']) if item['mosaic_rank'] else None,
-            "客户评分": float(item['rating']) if item['rating'] else None,
-            "评论数量": int(item['num_reviews']) if item['num_reviews'] else None,
-            "更新时间": query_date
-        }
-        records.append({"fields": fields})
+        existing.append({
+            "timestamp": timestamp,
+            "date_str": date_str,
+            "asin": item['asin'],
+            "arts_rank": int(item['arts_rank']) if item['arts_rank'] else None,
+            "mosaic_rank": int(item['mosaic_rank']) if item['mosaic_rank'] else None,
+            "rating": float(item['rating']) if item['rating'] else None,
+            "num_reviews": int(item['num_reviews']) if item['num_reviews'] else None
+        })
     
-    return {
-        "action": "batch_create",
-        "app_token": app_token,
-        "table_id": table_id,
-        "records": records
-    }
+    # Sort by timestamp ascending (oldest first)
+    existing.sort(key=lambda x: x['timestamp'])
+    
+    # Save back
+    with open(DATA_FILE, 'w', encoding='utf-8') as f:
+        json.dump(existing, f, indent=2, ensure_ascii=False)
+    
+    print(f"✅ Saved {len(data)} new records to local history file")
+    print(f"📁 Location: {DATA_FILE}")
+    print(f"📊 Total historical records: {len(existing)}")
+    
+    return True
 
 def main():
     from datetime import datetime
@@ -156,8 +169,8 @@ def main():
         info = get_product_info(asin)
         data.append(info)
     
-    # Prepare records and write via openclaw (when run in openclaw context)
-    bitable_request = prepare_bitable_records(data)
+    # Save to local JSON file for historical tracking
+    save_to_json(data)
     
     # Generate markdown message
     message = "📊 **Amazon Product All Categories Ranking**\n\n"
@@ -175,15 +188,10 @@ def main():
         message += "\n"
     
     message += f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} GMT+8\n"
-    message += f"\n✅ 数据已自动记录到飞书多维表格「亚马逊排名历史」\n"
+    message += f"\n✅ 数据已保存到本地历史趋势文件，可以在控制面板查看趋势图\n"
     
     # Print output
     print(message)
-    
-    # Also output the bitable request as json for openclaw to use
-    print("\n--- BITABLE_REQUEST_BEGIN ---")
-    print(json.dumps(bitable_request, indent=2))
-    print("--- BITABLE_REQUEST_END ---")
 
 if __name__ == "__main__":
     main()

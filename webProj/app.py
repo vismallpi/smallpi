@@ -491,6 +491,20 @@ def list_amazon_logs():
         })
     return jsonify({'success': True, 'logs': result})
 
+# ==================== Amazon Ranking History API ====================
+@app.route('/api/amazon/ranking-history', methods=['GET'])
+def get_ranking_history():
+    """Get all historical ranking data for trend chart"""
+    data_file = "/root/.openclaw/workspace/Amazon/data/ranking_history.json"
+    if not os.path.exists(data_file):
+        return jsonify({'success': True, 'data': []})
+    try:
+        with open(data_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify({'success': True, 'data': data})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/api/amazon/log-content', methods=['GET'])
 def get_amazon_log_content():
     """Get content of a specific log file"""
