@@ -447,7 +447,8 @@ function runFullPageScreenshot() {
 let lastLog = {
     'manual': null,
     'auto': null,
-    'fullpage': null
+    'fullpage': null,
+    'ranking': null
 };
 
 function openLogModal(section) {
@@ -472,6 +473,7 @@ function openLogModal(section) {
                 if (section === 'manual') suffix = '_manual_search.log';
                 if (section === 'auto') suffix = '_daily_search.log';
                 if (section === 'fullpage') suffix = '_fullpage_search.log';
+                if (section === 'ranking') suffix = '_ranking_check.log';
                 let filtered = data.logs.filter(l => l.filename.endsWith(suffix));
                 if (filtered.length > 0) {
                     const latest = filtered[0];
@@ -676,7 +678,7 @@ async function saveEditableContent(el) {
         <div class="content-wrapper">
             <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Amazon Keyword Search Control Panel</h1>
             <div class="version-info">
-                v1.5.4 - Each section filters logs by script type, filenames clearly show which script it belongs to
+                v1.6.0 - Added Section 4: Ranking Check & Update with real-time log viewer
             </div>
 
             <div class="script-item">
@@ -750,6 +752,18 @@ async function saveEditableContent(el) {
                 <div class="button-group">
                     <button onclick="runFullPageScreenshot(); lastLog.fullpage = null; openLogModal('fullpage')">Start Full Screenshot</button>
                     <button class="secondary" onclick="openLogModal('fullpage')">View Latest Log</button>
+                </div>
+            </div>
+
+            <div class="script-item">
+                <h2 contenteditable="true" style="cursor: text;">4. Ranking Check & Update - amazon-ranking-check.py</h2>
+                <div class="description" contenteditable="true" style="cursor: text;">
+                    <strong>Function:</strong> Extract current product rankings (Arts, Crafts & Sewing / Mosaic Tiles), customer rating and review counts, then automatically write to Feishu Bitable for historical tracking.<br>
+                    Runs automatically after daily search, can also manually trigger to update rankings now.
+                </div>
+                <div class="button-group">
+                    <button onclick="runRankingCheck(); lastLog.ranking = null; openLogModal('ranking')">Run Ranking Check & Update</button>
+                    <button class="secondary" onclick="openLogModal('ranking')">View Latest Log</button>
                 </div>
             </div>
 

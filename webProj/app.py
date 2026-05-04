@@ -398,6 +398,23 @@ def run_auto_search():
             'error': str(e)
         })
 
+@app.route('/api/run-ranking-check', methods=['POST'])
+def run_ranking_check():
+    """运行排名提取并更新飞书表格脚本 amazon-ranking-check.py"""
+    try:
+        cmd = "cd /root/.openclaw/workspace/Amazon && python3 ./amazon-ranking-check.py"
+        # 后台运行
+        subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return jsonify({
+            'success': True,
+            'message': '已开始后台运行排名提取，请稍候等待完成，结果会自动写入飞书表格并发送通知...'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
+
 @app.route('/api/run-manual-search', methods=['POST'])
 def run_manual_search():
     """运行手动单个搜索"""
