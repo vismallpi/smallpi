@@ -786,12 +786,13 @@ async function saveEditableContent(el) {
             <div class="script-item">
                 <h2 contenteditable="true" style="cursor: text;">4. Ranking Check & Update - amazon-ranking-check.py</h2>
                 <div class="description" contenteditable="true" style="cursor: text;">
-                    <strong>Function:</strong> Extract current product rankings (Arts, Crafts & Sewing / Mosaic Tiles), customer rating and review counts, then automatically write to Feishu Bitable for historical tracking.<br>
+                    <strong>Function:</strong> Extract current product rankings (Arts, Crafts & Sewing / Mosaic Tiles), customer rating and review counts, save to local history file, show trend chart.<br>
                     Runs automatically after daily search, can also manually trigger to update rankings now.
                 </div>
                 <div class="button-group">
                     <button onclick="runRankingCheck(); lastLog.ranking = null; openLogModal('ranking')">Run Ranking Check & Update</button>
                     <button class="secondary" onclick="openLogModal('ranking')">View Latest Log</button>
+                    <button class="secondary" onclick="openTrendModal()">📈 View Ranking Trend</button>
                 </div>
             </div>
 
@@ -815,9 +816,6 @@ async function saveEditableContent(el) {
             <div class="modal-body">
                 <pre id="log-content">Loading...</pre>
                 <div id="screenshot-gallery"></div>
-                <div style="margin-top: 16px; text-align: center;">
-                    <button onclick="openTrendModal();" style="padding: 10px 20px; background-color: #A9C5ED; border: 1px solid #8CA6D9; border-radius: 2px; color: #2d3b55; font-size: 15px; font-weight: 500; cursor: pointer;">📈 View Ranking Trend</button>
-                </div>
             </div>
         </div>
     </div>
