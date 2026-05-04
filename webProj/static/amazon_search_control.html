@@ -9,6 +9,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -43,31 +45,66 @@
             text-align: center;
         }
 
-        .script-item {
-            margin-bottom: 24px;
+        .script-group {
+            margin-bottom: 20px;
             background-color: #ffffff;
             border: 1px solid #e9e9e7;
             border-radius: 2px;
-            padding: 20px 16px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .script-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 16px;
+            color: #37352f;
+            background-color: #f7f6f3;
+            border-bottom: 1px solid #f0f0ee;
+            cursor: pointer;
+        }
+
+        .script-header .toggle-icon {
+            color: #9b9a97;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .script-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .script-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .script-header.collapsed + .script-content {
+            max-height: 0;
+            opacity: 0;
         }
 
         h2 {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 600;
             color: #37352f;
-            margin-top: 0;
-            margin-bottom: 10px;
+            margin: 0;
         }
 
         .description {
             color: #6e6e6e;
             margin-bottom: 16px;
             line-height: 1.6;
+            padding: 0 16px;
+            padding-top: 16px;
         }
 
         .input-group {
             margin-bottom: 15px;
+            padding: 0 16px;
         }
 
         label {
@@ -108,6 +145,7 @@
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
+            padding: 0 16px 16px 16px;
         }
 
         button {
@@ -138,7 +176,7 @@
         }
 
         .note {
-            margin-top: 20px;
+            margin: 0 16px 16px 16px;
             padding: 15px 16px;
             background-color: #ffffff;
             border: 1px solid #e9e9e7;
@@ -408,40 +446,6 @@ function runManualSearch() {
     }
 }
 
-function runFullPageScreenshot() {
-    try {
-        const keyword = document.getElementById('keyword_full').value;
-        const asin = document.getElementById('asin_full').value;
-        if (!keyword || !asin) {
-            alert('Please fill in search keyword and target ASIN!');
-            return;
-        }
-        fetch('/api/run-fullpage-screenshot', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ keyword, asin })
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.json();
-        })
-        .then(result => {
-            if (result.success) {
-                alert(result.message);
-                // After triggering run, the next log will be this fullpage run, so clear cache to load latest from server
-                lastLog.fullpage = null;
-            } else {
-                alert('Run failed: ' + result.error);
-            }
-        })
-        .catch(error => {
-            alert('Request failed: ' + error.message);
-        });
-    } catch (e) {
-        alert('JavaScript Error: ' + e.message);
-    }
-}
-
 function runRankingCheck() {
     try {
         fetch('/api/run-ranking-check', {
@@ -451,7 +455,7 @@ function runRankingCheck() {
         .then(response => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return response.json();
-        })
+            })
         .then(result => {
             if (result.success) {
                 alert(result.message);
@@ -475,7 +479,6 @@ function runRankingCheck() {
 let lastLog = {
     'manual': null,
     'auto': null,
-    'fullpage': null,
     'ranking': null
 };
 
@@ -500,7 +503,6 @@ function openLogModal(section) {
                 let suffix;
                 if (section === 'manual') suffix = '_manual_search.log';
                 if (section === 'auto') suffix = '_daily_search.log';
-                if (section === 'fullpage') suffix = '_fullpage_search.log';
                 if (section === 'ranking') suffix = '_ranking_check.log';
                 let filtered = data.logs.filter(l => l.filename.endsWith(suffix));
                 if (filtered.length > 0) {
@@ -524,25 +526,6 @@ function openLogModal(section) {
 function closeLogModal() {
     const modal = document.getElementById('log-modal');
     modal.style.display = 'none';
-}
-
-function loadLatestLog() {
-    document.getElementById('log-content').textContent = 'Loading...';
-    fetch(`${API_BASE}/amazon/logs`)
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.logs.length > 0) {
-            // Load latest log
-            const latest = data.logs[0];
-            loadLogContent(latest.filename);
-            document.getElementById('modal-title').textContent = `Latest Log - ${latest.mtime_str}`;
-        } else {
-            document.getElementById('log-content').textContent = 'No log files found.';
-        }
-    })
-    .catch(error => {
-        document.getElementById('log-content').textContent = 'Failed to load log list: ' + error.message;
-    });
 }
 
 function loadLogContent(filename) {
@@ -601,6 +584,14 @@ window.onclick = function(event) {
     }
 }
 
+// Toggle script section collapse/expand
+document.addEventListener('click', function(e) {
+    const header = e.target.closest('.script-header');
+    if (header) {
+        header.classList.toggle('collapsed');
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, binding events');
     
@@ -609,6 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeLogModal();
+            closeTrendModal();
         }
     });
     
@@ -638,6 +630,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Initialize all sections as expanded by default
+    // User can collapse them if they want
 });
 
 // ==================== 页面标题保存功能 ====================
@@ -706,102 +701,104 @@ async function saveEditableContent(el) {
         <div class="content-wrapper">
             <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Amazon Keyword Search Control Panel</h1>
             <div class="version-info">
-                v1.6.0 - Added Section 4: Ranking Check & Update with real-time log viewer
+                v2.0.0 - Collapsible sections like Todo List, click header to toggle
             </div>
 
-            <div class="script-item">
-                <h2 contenteditable="true" style="cursor: text;">1. Manual Single Search - amazon_search_asin_screenshot.py</h2>
-                <div class="description" contenteditable="true" style="cursor: text;">
-                    <strong>Function:</strong> Custom keyword & target ASIN, auto-search and take screenshot when ASIN found.
+            <div class="script-group">
+                <div class="script-header" onclick="this.classList.toggle('collapsed')">
+                    <h2 contenteditable="true">1. Manual Single Search - amazon_search_asin_screenshot.py</h2>
+                    <span class="toggle-icon">▶</span>
                 </div>
-                <div class="input-group">
-                    <label for="keyword">Search Keyword:</label>
-                    <input type="text" id="keyword" placeholder="e.g. mosaic kits for adults" list="keywordList">
-                    <datalist id="keywordList">
-                        <option value="mosaic kits for adults"></option>
-                        <option value="adult mosaic art kits"></option>
-                        <option value="diy mosaic kits for adults"></option>
-                        <option value="complete mosaic kits"></option>
-                        <option value="beginner mosaic kits"></option>
-                        <option value="mosaic craft kits"></option>
-                        <option value="mosaic planter kit"></option>
-                        <option value="mosaic flower pot kit"></option>
-                        <option value="glass mosaic kits for adults"></option>
-                        <option value="large mosaic kits"></option>
-                        <option value="creative mosaic kits"></option>
-                        <option value="mosaic hobby kits"></option>
-                        <option value="handmade mosaic kit"></option>
-                        <option value="mosaic diy craft kit"></option>
-                    </datalist>
-                </div>
-                <div class="input-group">
-                    <label for="asin">Target ASIN:</label>
-                    <select id="asin">
-                        <option value="">-- Please select --</option>
-                        <option value="B0DDDWWJBC">B0DDDWWJBC (NEW)</option>
-                        <option value="B0CWZ2Z5TS">B0CWZ2Z5TS (OLD)</option>
-                    </select>
-                </div>
-                <div class="button-group">
-                    <button onclick="runManualSearch(); lastLog.manual = null; openLogModal('manual')">Run Search</button>
-                    <button class="secondary" onclick="openLogModal('manual')">View Latest Log</button>
-                </div>
-            </div>
-
-            <div class="script-item">
-                <h2 contenteditable="true" style="cursor: text;">2. Auto-run Daily Script - amazon_search_mosaic_kits.py</h2>
-                <div class="description" contenteditable="true" style="cursor: text;">
-                    <strong>Function:</strong> Auto-search based on fixed configuration (daily monitoring task), find both target ASINs (<code>B0DDDWWJBC (NEW)</code> & <code>B0CWZ2Z5TS (OLD)</code>), send logs and screenshots to you after completion.<br>
-                    This is the daily scheduled task that runs automatically twice a day.
-                </div>
-                <div class="button-group">
-                    <button onclick="runScript('amazon_search_mosaic_kits.py'); lastLog.auto = null; openLogModal('auto')">Run Now (Manual Trigger)</button>
-                    <button class="secondary" onclick="openLogModal('auto')">View Latest Log</button>
+                <div class="script-content">
+                    <div class="description" contenteditable="true" style="cursor: text;">
+                        <strong>Function:</strong> Custom keyword & target ASIN, auto-search and take screenshot when ASIN found.
+                    </div>
+                    <div class="input-group">
+                        <label for="keyword">Search Keyword:</label>
+                        <input type="text" id="keyword" placeholder="e.g. mosaic kits for adults" list="keywordList">
+                        <datalist id="keywordList">
+                            <option value="mosaic kits for adults"></option>
+                            <option value="adult mosaic art kits"></option>
+                            <option value="diy mosaic kits for adults"></option>
+                            <option value="complete mosaic kits"></option>
+                            <option value="beginner mosaic kits"></option>
+                            <option value="mosaic craft kits"></option>
+                            <option value="mosaic planter kit"></option>
+                            <option value="mosaic flower pot kit"></option>
+                            <option value="glass mosaic kits for adults"></option>
+                            <option value="large mosaic kits"></option>
+                            <option value="creative mosaic kits"></option>
+                            <option value="mosaic hobby kits"></option>
+                            <option value="handmade mosaic kit"></option>
+                            <option value="mosaic diy craft kit"></option>
+                        </datalist>
+                    </div>
+                    <div class="input-group">
+                        <label for="asin">Target ASIN:</label>
+                        <select id="asin">
+                            <option value="">-- Please select --</option>
+                            <option value="B0DDDWWJBC">B0DDDWWJBC (NEW)</option>
+                            <option value="B0CWZ2Z5TS">B0CWZ2Z5TS (OLD)</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button onclick="runManualSearch(); lastLog.manual = null; openLogModal('manual')">Run Search</button>
+                        <button class="secondary" onclick="openLogModal('manual')">View Latest Log</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="script-item">
-                <h2 contenteditable="true" style="cursor: text;">3. Full Page Screenshot - search_each_page_screenshot.py</h2>
-                <div class="description" contenteditable="true" style="cursor: text;">
-                    <strong>Function:</strong> Search pages 1-5 for specified keyword, <strong>save screenshot for every page</strong>, all page screenshots will be saved even if target ASIN not found.
+            <div class="script-group">
+                <div class="script-header" onclick="this.classList.toggle('collapsed')">
+                    <h2 contenteditable="true">2. Auto-run Daily Script - amazon_search_mosaic_kits.py</h2>
+                    <span class="toggle-icon">▶</span>
                 </div>
-                <div class="input-group">
-                    <label for="keyword_full">Search Keyword:</label>
-                    <input type="text" id="keyword_full" placeholder="e.g. mosaic beginner" list="keywordList">
-                </div>
-                <div class="input-group">
-                    <label for="asin_full">Target ASIN:</label>
-                    <select id="asin_full">
-                        <option value="">-- Please select --</option>
-                        <option value="B0DDDWWJBC">B0DDDWWJBC (NEW)</option>
-                        <option value="B0CWZ2Z5TS">B0CWZ2Z5TS (OLD)</option>
-                    </select>
-                </div>
-                <div class="button-group">
-                    <button onclick="runFullPageScreenshot(); lastLog.fullpage = null; openLogModal('fullpage')">Start Full Screenshot</button>
-                    <button class="secondary" onclick="openLogModal('fullpage')">View Latest Log</button>
+                <div class="script-content">
+                    <div class="description" contenteditable="true" style="cursor: text;">
+                        <strong>Function:</strong> Auto-search based on fixed configuration (daily monitoring task), find both target ASINs (<code>B0DDDWWJBC (NEW)</code> & <code>B0CWZ2Z5TS (OLD)</code>), send logs and screenshots to you after completion.<br>
+                        This is the daily scheduled task that runs automatically twice a day.
+                    </div>
+                    <div class="button-group">
+                        <button onclick="runScript('amazon_search_mosaic_kits.py'); lastLog.auto = null; openLogModal('auto')">Run Now (Manual Trigger)</button>
+                        <button class="secondary" onclick="openLogModal('auto')">View Latest Log</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="script-item">
-                <h2 contenteditable="true" style="cursor: text;">4. Ranking Check & Update - amazon-ranking-check.py</h2>
-                <div class="description" contenteditable="true" style="cursor: text;">
-                    <strong>Function:</strong> Extract current product rankings (Arts, Crafts & Sewing / Mosaic Tiles), customer rating and review counts, save to local history file, show trend chart.<br>
-                    Runs automatically after daily search, can also manually trigger to update rankings now.
+            <div class="script-group">
+                <div class="script-header" onclick="this.classList.toggle('collapsed')">
+                    <h2 contenteditable="true">3. Ranking Check & Update - amazon-ranking-check.py</h2>
+                    <span class="toggle-icon">▶</span>
                 </div>
-                <div class="button-group">
-                    <button onclick="runRankingCheck(); lastLog.ranking = null; openLogModal('ranking')">Run Ranking Check & Update</button>
-                    <button class="secondary" onclick="openLogModal('ranking')">View Latest Log</button>
-                    <button class="secondary" onclick="openTrendModal()">📈 View Ranking Trend</button>
+                <div class="script-content">
+                    <div class="description" contenteditable="true" style="cursor: text;">
+                        <strong>Function:</strong> Extract current product rankings (Arts, Crafts & Sewing / Mosaic Tiles), customer rating and review counts, save to local history file, show trend chart.<br>
+                        Runs automatically after daily search, can also manually trigger to update rankings now.
+                    </div>
+                    <div class="button-group">
+                        <button onclick="runRankingCheck(); lastLog.ranking = null; openLogModal('ranking')">Run Ranking Check & Update</button>
+                        <button class="secondary" onclick="openLogModal('ranking')">View Latest Log</button>
+                        <button class="secondary" onclick="openTrendModal()">📈 View Ranking Trend</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="note" contenteditable="true" style="cursor: text;">
-                <strong>Instructions:</strong><br>
-                1. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
-                2. Click the run button to execute the script<br>
-                3. Click "View Latest Log" to open real-time log viewer<br>
-                4. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
+            <div class="script-group">
+                <div class="script-header" onclick="this.classList.toggle('collapsed')">
+                    <h2 contenteditable="true">Instructions</h2>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="script-content collapsed">
+                    <div class="description" contenteditable="true" style="cursor: text;">
+                        <strong>How to use:</strong><br>
+                        1. Click the section header to expand/collapse (the > arrow)<br>
+                        2. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
+                        3. Click the run button to execute the script<br>
+                        4. Click "View Latest Log" to open real-time log viewer<br>
+                        5. Click "📈 View Ranking Trend" to see the history ranking chart and table<br>
+                        6. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
+                    </div>
+                </div>
             </div>
         </div>
     </div>
