@@ -16,5 +16,23 @@
     "mosaic_rank": 167,
     "rating": 4.4,
     "num_reviews": 31
+  },
+  {
+    "timestamp": 1777893469,
+    "date_str": "2026-05-04 19:17:49",
+    "asin": "B0DDDWWJBC",
+    "arts_rank": 78970,
+    "mosaic_rank": 286,
+    "rating": 4.0,
+    "num_reviews": 17
+  },
+  {
+    "timestamp": 1777893469,
+    "date_str": "2026-05-04 19:17:49",
+    "asin": "B0CWZ2Z5TS",
+    "arts_rank": 49338,
+    "mosaic_rank": 171,
+    "rating": 4.4,
+    "num_reviews": 31
   }
 ]
