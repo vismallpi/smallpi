@@ -71,16 +71,11 @@
             flex: 1;
         }
 
-        .script-header .toggle-icon {
+        .script-header .view-code-icon {
             color: #9b9a97;
             font-size: 16px;
-            transition: transform 0.3s ease;
             cursor: pointer;
             padding: 0 8px;
-        }
-
-        .script-header.collapsed .toggle-icon {
-            transform: rotate(-90deg);
         }
 
         .script-content-main {
@@ -88,35 +83,23 @@
             overflow: hidden;
         }
 
-        .script-code-block {
-            transition: all 0.3s ease;
-            overflow: hidden;
-            background-color: #f7f6f3;
-            border-top: 1px solid #f0f0ee;
-        }
-
-        .script-header.collapsed + .script-content-main + .script-code-block {
-            max-height: 0;
-            opacity: 0;
-        }
-
         .script-header.collapsed + .script-content-main {
             max-height: 0;
             opacity: 0;
         }
 
-        pre.script-code {
+        pre.script-code-modal {
             margin: 0;
-            padding: 12px 16px;
-            background-color: #f7f6f3;
+            padding: 0;
+            background-color: #ffffff;
             white-space: pre;
             word-wrap: normal;
             overflow-x: auto;
+            overflow-y: auto;
             font-family: monospace;
             font-size: 12px;
             line-height: 1.4;
-            max-height: 400px;
-            overflow-y: auto;
+            max-height: calc(70vh - 80px);
         }
 
         h2 {
@@ -633,6 +616,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape') {
             closeLogModal();
             closeTrendModal();
+            closeSourceCodeModal();
         }
     });
     
@@ -665,30 +649,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize all sections as expanded by default
     // User can collapse them if they want
-
-    // Load source code for each script when page loads
-    loadScriptSource('amazon_search_asin_screenshot.py', 'code-manual');
-    loadScriptSource('amazon_search_mosaic_kits.py', 'code-auto');
-    loadScriptSource('amazon-ranking-check.py', 'code-ranking');
 });
-
-// Load source code from server and display
-function loadScriptSource(scriptName, elementId) {
-    fetch(`${API_BASE}/amazon/source-code/${scriptName}`)
-    .then(response => response.json())
-    .then(data => {
-        const el = document.getElementById(elementId);
-        if (data.success) {
-            el.textContent = data.content;
-        } else {
-            el.textContent = `Failed to load: ${data.error || 'Unknown error'}`;
-        }
-    })
-    .catch(error => {
-        const el = document.getElementById(elementId);
-        el.textContent = `Request failed: ${error.message}`;
-    });
-}
 
 // ==================== 页面标题保存功能 ====================
 function loadPageTitle() {
@@ -764,7 +725,7 @@ async function saveEditableContent(el) {
                     <div class="title" onclick="document.querySelector('.script-content-main[data-script=manual]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
                         <h2 contenteditable="true">1. Manual Single Search - amazon_search_asin_screenshot.py</h2>
                     </div>
-                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=manual]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
+                    <span class="view-code-icon" onclick="openSourceCodeModal('amazon_search_asin_screenshot.py', 'Manual Single Search - amazon_search_asin_screenshot.py');">▶</span>
                 </div>
                 <div class="script-content-main" data-script="manual">
                     <div class="description" contenteditable="true" style="cursor: text;">
@@ -803,9 +764,6 @@ async function saveEditableContent(el) {
                         <button class="secondary" onclick="openLogModal('manual')">View Latest Log</button>
                     </div>
                 </div>
-                <div class="script-code-block" data-script="manual">
-<pre class="script-code" id="code-manual">Loading source code...</pre>
-                </div>
             </div>
 
             <div class="script-group">
@@ -813,7 +771,7 @@ async function saveEditableContent(el) {
                     <div class="title" onclick="document.querySelector('.script-content-main[data-script=auto]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
                         <h2 contenteditable="true">2. Auto-run Daily Script - amazon_search_mosaic_kits.py</h2>
                     </div>
-                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=auto]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
+                    <span class="view-code-icon" onclick="openSourceCodeModal('amazon_search_mosaic_kits.py', 'Auto-run Daily Script - amazon_search_mosaic_kits.py');">▶</span>
                 </div>
                 <div class="script-content-main" data-script="auto">
                     <div class="description" contenteditable="true" style="cursor: text;">
@@ -825,9 +783,6 @@ async function saveEditableContent(el) {
                         <button class="secondary" onclick="openLogModal('auto')">View Latest Log</button>
                     </div>
                 </div>
-                <div class="script-code-block" data-script="auto">
-<pre class="script-code" id="code-auto">Loading source code...</pre>
-                </div>
             </div>
 
             <div class="script-group">
@@ -835,7 +790,7 @@ async function saveEditableContent(el) {
                     <div class="title" onclick="document.querySelector('.script-content-main[data-script=ranking]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
                         <h2 contenteditable="true">3. Ranking Check & Update - amazon-ranking-check.py</h2>
                     </div>
-                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=ranking]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
+                    <span class="view-code-icon" onclick="openSourceCodeModal('amazon-ranking-check.py', 'Ranking Check & Update - amazon-ranking-check.py');">▶</span>
                 </div>
                 <div class="script-content-main" data-script="ranking">
                     <div class="description" contenteditable="true" style="cursor: text;">
@@ -848,9 +803,6 @@ async function saveEditableContent(el) {
                         <button class="secondary" onclick="openTrendModal()">📈 View Ranking Trend</button>
                     </div>
                 </div>
-                <div class="script-code-block" data-script="ranking">
-<pre class="script-code" id="code-ranking">Loading source code...</pre>
-                </div>
             </div>
 
             <div class="script-group">
@@ -858,22 +810,19 @@ async function saveEditableContent(el) {
                     <div class="title" onclick="document.querySelector('.script-content-main[data-script=instructions]').classList.toggle('collapsed'); this.parentElement.classList.toggle('collapsed');">
                         <h2 contenteditable="true">Instructions</h2>
                     </div>
-                    <span class="toggle-icon" onclick="document.querySelector('.script-code-block[data-script=instructions]').classList.toggle('collapsed'); this.classList.toggle('collapsed');">▶</span>
+                    <span class="view-code-icon"></span>
                 </div>
                 <div class="script-content-main collapsed" data-script="instructions">
                     <div class="description" contenteditable="true" style="cursor: text;">
                         <strong>How to use:</strong><br>
                         1. <strong>Left (title area):</strong> click to expand/collapse the main content (inputs & buttons)<br>
-                        2. <strong>Right (> arrow):</strong> click to expand/collapse the original Python source code<br>
+                        2. <strong>Right (>):</strong> click to pop up a dialog to view the Python source code<br>
                         3. Fill in parameters in the corresponding section (Keyword / ASIN)<br>
                         4. Click the run button to execute the script<br>
                         5. Click "View Latest Log" to open real-time log viewer<br>
                         6. Click "📈 View Ranking Trend" to see the history ranking chart and table<br>
                         7. The script will run in the server background, results and screenshots will be automatically sent to your Feishu chat window ✅
                     </div>
-                </div>
-                <div class="script-code-block" data-script="instructions">
-<pre class="script-code" id="code-instructions">No source code for instructions section</pre>
                 </div>
             </div>
         </div>
@@ -928,9 +877,50 @@ async function saveEditableContent(el) {
         </div>
     </div>
 
+    <!-- Source Code Modal -->
+    <div id="source-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 id="source-modal-title">Source Code</h3>
+                <button class="modal-close" onclick="closeSourceCodeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+<pre class="script-code-modal" id="source-modal-content">Loading...</pre>
+            </div>
+        </div>
+    </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <script>
 let rankingChart = null;
+let currentSourceScript = null;
+
+function openSourceCodeModal(scriptName, title) {
+    currentSourceScript = scriptName;
+    const modal = document.getElementById('source-modal');
+    modal.style.display = 'block';
+    document.getElementById('source-modal-title').textContent = title;
+    document.getElementById('source-modal-content').textContent = 'Loading...';
+    
+    // Load source code from server
+    fetch(`${API_BASE}/amazon/source-code/${scriptName}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('source-modal-content').textContent = data.content;
+        } else {
+            document.getElementById('source-modal-content').textContent = `Failed to load: ${data.error || 'Unknown error'}`;
+        }
+    })
+    .catch(error => {
+        document.getElementById('source-modal-content').textContent = `Request failed: ${error.message}`;
+    });
+}
+
+function closeSourceCodeModal() {
+    const modal = document.getElementById('source-modal');
+    modal.style.display = 'none';
+}
 
 function openTrendModal() {
     const modal = document.getElementById('trend-modal');
@@ -947,11 +937,15 @@ function closeTrendModal() {
 window.onclick = function(event) {
     const logModal = document.getElementById('log-modal');
     const trendModal = document.getElementById('trend-modal');
+    const sourceModal = document.getElementById('source-modal');
     if (event.target == logModal) {
         closeLogModal();
     }
     if (event.target == trendModal) {
         closeTrendModal();
+    }
+    if (event.target == sourceModal) {
+        closeSourceCodeModal();
     }
 }
 
