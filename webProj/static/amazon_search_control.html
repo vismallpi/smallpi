@@ -90,11 +90,11 @@
 
         pre.script-code-modal {
             margin: 0;
-            padding: 8px 8px 8px 50px;
+            padding: 8px 0;
+            padding-left: 50px;
             background-color: #ffffff;
             color: #333333;
             white-space: pre;
-            word-wrap: normal;
             overflow-x: auto;
             overflow-y: auto;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -107,12 +107,12 @@
             border: 1px solid #e0e0e0;
         }
 
-        pre.script-code-modal code {
+        pre.script-code-modal span.line {
             display: block;
             counter-increment: line;
         }
 
-        pre.script-code-modal code::before {
+        pre.script-code-modal span.line::before {
             content: counter(line);
             display: inline-block;
             width: 40px;
@@ -950,17 +950,15 @@ function openSourceCodeModal(scriptName, title) {
     .then(data => {
         if (data.success) {
             const contentEl = document.getElementById('source-modal-content');
-            // Add line numbers by wrapping each line in <code>
+            // Add line numbers by wrapping each line in <span class="line">
             const lines = data.content.split('\n');
-            contentEl.innerHTML = lines.map(line => `<code>${line.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`).join('\n');
-            // Apply syntax highlighting to each line
+            contentEl.innerHTML = lines.map(line => `<span class="line">${line.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('\n');
+            // Apply syntax highlighting to the whole block
             contentEl.className = 'script-code-modal language-python';
-            contentEl.querySelectorAll('code').forEach(block => {
-                hljs.highlightElement(block);
-            });
+            hljs.highlightElement(contentEl);
         } else {
             document.getElementById('source-modal-title').textContent = scriptName;
-            document.getElementById('source-modal-content').textContent = `Failed to load: ${data.error || 'Unknown error'}`;
+            document.getElementById('source-modal-content').textContent = `Failed to load: ${data.error || 'Unknown error'};
         }
     })
     .catch(error => {
