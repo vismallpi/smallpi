@@ -75,3 +75,13 @@ This file stores important decisions, lessons learned, and key information that 
     - `0.0.0.0:8080` (HTTPS)
     - `0.0.0.0:8081` (HTTP)
 
+- Amazon Search Control Panel 最新版本：**v2.2.4**
+  - 变化：
+    1. v2.1.0：统一代码对话框样式，PyCharm Light 主题语法高亮，每行左侧固定行号，三个section弹出对话框样式完全一致
+    2. v2.2.0：移除行号显示，移除代码框边框，节省更多空间给代码查看，保留语法高亮
+    3. v2.2.1：修复语法高亮问题，移除强制黑色文字，恢复高亮颜色，移除代码框多余内边距消除整体缩进
+    4. v2.2.2：完全消除整体缩进，代码框占满整个modal-body宽度，保留正确padding，语法高亮正常
+    5. v2.2.3：标准代码框，强制白色背景匹配modal，语法高亮保留，正确显示
+    6. v2.2.4：完全移除代码框内边距，代码从最左侧开始显示，最大限度利用空间，只保留modal-body本身padding
+  - 开发规则：每次代码改动必须更新版本号并写入MEMORY.md
+

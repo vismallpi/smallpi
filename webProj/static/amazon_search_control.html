@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>亚马逊关键词搜索控制</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/pycharm.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -90,9 +93,8 @@
 
         pre.script-code-modal {
             margin: 0;
-            padding: 8px 0;
-            background-color: #ffffff;
-            color: #333333;
+            padding: 0;
+            background-color: #ffffff !important;
             white-space: pre;
             overflow-x: auto;
             overflow-y: auto;
@@ -100,30 +102,8 @@
             font-size: 13px;
             line-height: 1.5;
             max-height: calc(70vh - 80px);
-            border-radius: 4px;
-            position: relative;
-            counter-reset: line;
-            border: 1px solid #e0e0e0;
-        }
-
-        pre.script-code-modal span.line {
-            display: block;
-            counter-increment: line;
-            padding-left: 50px;
-            position: relative;
-        }
-
-        pre.script-code-modal span.line::before {
-            content: counter(line);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 40px;
-            text-align: right;
-            padding-right: 10px;
-            color: #999999;
-            border-right: 1px solid #dddddd;
-            background-color: #f5f5f5;
+            border-radius: 0;
+            border: none;
         }
 
         h2 {
@@ -780,7 +760,7 @@ async function saveEditableContent(el) {
         <div class="content-wrapper">
             <h1 id="pageTitle" contenteditable="true" style="cursor: text; margin-top: 0; margin-bottom: 24px;">Amazon Keyword Search Control Panel</h1>
             <div class="version-info">
-                v2.0.0 - Collapsible sections like Todo List, click header to toggle
+                v2.2.4 - Remove all extra padding, code starts from left edge to maximize space
             </div>
 
             <div class="script-group">
@@ -953,8 +933,8 @@ function openSourceCodeModal(scriptName, title) {
         if (data.success) {
             const contentEl = document.getElementById('source-modal-content');
             // Add line numbers by wrapping each line in <span class="line">
-            const lines = data.content.split('\n');
-            contentEl.innerHTML = lines.map(line => `<span class="line">${line.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`).join('\n');
+            // Set raw content first for highlighting
+            contentEl.innerHTML = data.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             // Apply syntax highlighting to the whole block
             contentEl.className = 'script-code-modal language-python';
             hljs.highlightElement(contentEl);
